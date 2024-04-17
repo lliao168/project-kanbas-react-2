@@ -1,0 +1,23 @@
+.wd-container {
+    display: flex;
+}
+
+.wd-container > div {
+    margin-right: 20px; 
+    margin-top: 5px;
+}
+
+.wd-container > div:first-child {
+    margin-top: 0;
+}
+
+.min-height-kanbas-navigation {
+    min-height: 100%;
+}
+
+.wd-dashboard {
+    margin-left: 80px;
+}
+
+
+

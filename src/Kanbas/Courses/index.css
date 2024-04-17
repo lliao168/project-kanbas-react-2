@@ -1,0 +1,79 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    margin-left: 110px;
+}
+
+
+.course-status {
+    width: 250px;
+    margin-left: 30px; 
+    margin-top: 20px;
+}
+
+
+.wd-kanbas-navigation-narrow {
+list-style: none;
+width: 100%;
+}
+
+.wd-kanbas-navigation-narrow li {
+display: flex;
+align-items: center;
+padding: 10px; 
+margin-bottom: 5px;
+font-size: 0.8em; 
+text-align: center;
+}
+
+.wd-kanbas-navigation-narrow li a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: crimson;
+    text-decoration: none;
+    }
+
+.wd-kanbas-navigation-narrow li a i {
+    font-size: 2em;
+    margin-right: 15px;
+    }
+
+    
+.wd-course-navigation-narrow {
+list-style: none;
+width: 90px;
+}
+.wd-course-navigation-narrow li {
+display: flex;
+align-items: center;
+padding: 2px; 
+margin-bottom: 5px;
+font-size: 0.8em; 
+text-align: center;
+}
+
+.wd-course-navigation-narrow li a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    color: crimson;
+    text-decoration: none;
+    white-space: nowrap;
+    }
+
+.wd-course-navigation-narrow li a i {
+    font-size: 2em;
+    margin-right: 10px;
+    }    
+
+
+.center-text {
+    text-align: center;
+    color: white;
+    text-decoration: none;
+
+}
+
+

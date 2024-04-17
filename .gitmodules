@@ -1,0 +1,3 @@
+[submodule "kanbas-node-server-app"]
+	path = kanbas-node-server-app
+	url = ../kanbas-node-server-app
