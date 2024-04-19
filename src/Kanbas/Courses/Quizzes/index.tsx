@@ -118,12 +118,17 @@ function Quizzes () {
             console.error("Course ID is undefined.");
             return;
         }
-        e.preventDefault(); 
+        e.preventDefault();
         const newQuiz = createDefaultQuiz();
-        const createdQuiz = await client.createQuiz(courseId, newQuiz);
-        dispatch(addQuiz(createQuiz));
-        dispatch(selectQuiz(createdQuiz));
-        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${createdQuiz._id}`);
+        try {
+            const createdQuiz = await client.createQuiz(courseId, newQuiz);
+            dispatch(addQuiz(createdQuiz));
+            dispatch(selectQuiz(createdQuiz));
+            navigate(`/Kanbas/Courses/${courseId}/Quizzes/${createdQuiz._id}`);
+        } catch (e) {
+            console.log("error creating quiz: ", e);
+        }
+        
         
     };
     

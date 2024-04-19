@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { FaCheckCircle, FaEllipsisV } from "react-icons/fa";
 import { Link, useParams, useNavigate} from "react-router-dom";
 import { FaCaretDown, FaPlus } from "react-icons/fa6";
@@ -26,120 +25,56 @@ import {
 
 // import * as client from "../../../../Courses/Assignments/client";  
 import { findAssignmentsForCourse, createAssignment } from "../../../../Courses/Assignments/client";
+import React, { useState } from 'react';
+import * as client from "./client";  
 
-import {
-    addQuiz,
-    deleteQuiz,
-    updateQuiz,
-    selectQuiz,
-    setQuizzes,
-} from "../../reducer"
+function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
+    const [quizQuestion, setQuizQuestion] = useState(question.question);
+    const [choices, setChoices] = useState(question.multipleChoice || []);
 
-import * as client from "../../client";  
-import { findQuizzesForCourse, createQuiz } from "../../client";
-
-function QuizMultipleChoiceEditor({onCancel} : any) {
-    const { assignmentId, courseId, quizId } = useParams();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        findQuizzesForCourse(courseId)
-          .then((quizzes) =>
-            dispatch(selectQuiz(quizzes))
-        );
-      }, [courseId]);   
-    const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
-    // const assignment = useSelector((state: KanbasState) => state.assignmentsReducer.assignment);
-    const quiz = quizList.find(
-        (quiz) => quiz.course === courseId && quiz._id === quizId 
-    );
-    interface Assignment {
-        _id: string;
-        title: string;
-        course: string;
-        category: string;
-        description: string;
-        isPublished: boolean;
-    }
-
-    interface Quiz {
-        _id: string;
-        title: string;
-        course: string;
-        description: string;
-        isPublished: boolean;
-        points: Number;
-        dueDate: Date;
-        availableFromDate: Date;
-        availableUntilDate: Date;
-        pts: Number;
-        Questions: Number;
-        shuffleAnswer: Boolean;
-        QuizType: String;
-        Minutes: Number;
-        AccessCode: Number;
-    }
-
-    const [quizQuestion, setQuizQuestion] = useState('');
-    const handleQuestionChange = (value : any) => {
+    const handleQuestionChange = (value: string) => {
         setQuizQuestion(value);
-        // dispatch(updateAssignment({...assignment, description: value}));
     };
 
-    const [choices, setChoices] = useState([{id: 1, text:'', isCorrect: false}]);
-    const handleChoiceTextChange = (id : any, text : any) => {
-        setChoices(choices.map(choice => {
-            if (choice.id === id) {
-                return {...choice, text};
-            }
-            return choice;
-        }))
+    const handleChoiceTextChange = (id: any, text: string) => {
+        setChoices(choices.map((choice: any) => (choice._id === id ? { ...choice, text: text} : choice)));
     };
-    const handleCorrectChoiceChange = (id : any) => {
-        setChoices(choices.map(choice => {
-            return {...choice, isCorrect: choice.id === id};
-        }));
+
+    const handleCorrectChoiceChange = (id: any) => {
+        console.log("id", id);
+        console.log("Hello");
+        setChoices(choices.map((choice: any) => (
+            console.log(choice._id),
+            { 
+            ...choice, 
+            isCorrect: choice._id === id 
+        })));
+        
     };
-    const handleAddChoice = (e : any) => {
-        e.preventDefault();
+
+    const handleAddChoice = () => {
         const newId = choices.length > 0 ? choices[choices.length - 1].id + 1 : 1;
-        setChoices([...choices, {id: newId, text: '', isCorrect: false}]);
-    };
-    const handleRemoveChoice = (id : any, e : any) => {
-        e.preventDefault();
-        setChoices(choices.filter(choice => choice.id !== id));
+        setChoices([...choices, { id: newId, text: '', isCorrect: false }]);
     };
 
-
-    const handleAddQuiz = () => {
-        const newQuizDetails = {
-            ...quiz,
-            course: courseId,
-        };
-        if(courseId) {
-            client.createQuiz(courseId, newQuizDetails).then((newQuizDetails) => {
-                dispatch(addQuiz(newQuizDetails));
-            });
-        }
-      };
-
-    const handleUpdateQuiz = async () => {
-        const status = await client.updateQuiz(quiz);
-        dispatch(updateQuiz(quiz));
+    const handleRemoveChoice = (id: any) => {
+        setChoices(choices.filter((choice: any) => choice._id !== id));
     };
 
-    const handleSave = () => {
-        const questionData = {
+    const handleSave = async () => {
+        const updatedQuestion = {
+            ...question,
             question: quizQuestion,
-            choices,
+            multipleChoice: choices
         };
-        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`);
+        try {
+            await client.updateQuestion(updatedQuestion);
+            setQuestions((updatedQuestions: any) => updatedQuestions.map((q:any) => q._id === updatedQuestion._id ? updatedQuestion : q));
+        } catch (error) {
+            console.error("Error updating question:", error);
+            // Handle error appropriately, e.g., show an error message to the user
+        }
     };
-
-    const handleCancel = () => {
-
-    }
 
     return(
         <div className="flex-fill">
@@ -163,35 +98,33 @@ function QuizMultipleChoiceEditor({onCancel} : any) {
                             Answers:</label>
                 </div>
                 
-                    {choices.map((choice, index) => (
-                    <div className="row g-3" style={{marginLeft:"20px", marginRight:"20px", marginTop:"5px" }} key={choice.id}> 
+                    {choices.map((choice: any) => (
+                    <div key={choice._id} className="row g-3" style={{marginLeft:"20px", marginRight:"20px", marginTop:"5px" }}> 
                             <div className="col-md-6" style={{width:"200px"}}>
-                                <label htmlFor={`choice-${choice.id}`} style={{marginLeft: '5px'}}>
+                                <label htmlFor={`choice-${choice._id}`} style={{marginLeft: '5px'}}>
                                     Correct Answer
                                 </label>    
                             </div>
                             <div className="col-md-6" style={{width:"30px", marginLeft:"-80px"}}>
                                 <input
                                         type="radio"
-                                        id={`choice-${choice.id}`} 
+                                        id={choice._id} 
                                         name="correctChoice"
                                         className="me-2"
                                         checked={choice.isCorrect}
-                                        onChange={() => handleCorrectChoiceChange(choice.id)}
+                                        onClick={() => handleCorrectChoiceChange(choice._id)}
                                     /> 
-                                
-                                 
                             </div>
                             <div className="col-md-6" style={{width:"300px"}}>
                                 <textarea
                                     className="form-control" 
                                     style={{height:"30px"}}
                                     value={choice.text}
-                                    onChange={(e) => handleChoiceTextChange(choice.id, e.target.value)}
+                                    onChange={(e) => handleChoiceTextChange(choice._id, e.target.value)}
                                 />  
                             </div>    
                             <div className="col-md-6">
-                                <button className="ms-2" onClick={(e) => handleRemoveChoice(choice.id, e)} style={{border:"none", backgroundColor:"white"}}><GoTrash/></button>
+                                <button className="ms-2" onClick={(e) => handleRemoveChoice(choice._id)} style={{border:"none", backgroundColor:"white"}}><GoTrash/></button>
                             </div>
                             
                     </div>

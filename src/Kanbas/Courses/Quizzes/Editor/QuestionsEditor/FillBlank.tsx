@@ -1,124 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheckCircle, FaEllipsisV } from "react-icons/fa";
-import { Link, useParams, useNavigate} from "react-router-dom";
-import { FaCaretDown, FaPlus } from "react-icons/fa6";
-import { HiOutlinePencilSquare } from "react-icons/hi2";
-import { PiDotsSixVerticalBold } from "react-icons/pi";
-import { useSelector, useDispatch } from "react-redux";
-import { KanbasState } from '../../../../store';
-import { Modal, Button} from 'react-bootstrap';
-import { RxRocket } from "react-icons/rx";
-import { RiProhibitedLine } from "react-icons/ri";
-import { FaXmark } from "react-icons/fa6";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { CiSearch } from "react-icons/ci";
 import { GoTrash } from "react-icons/go";
+import * as client from "./client";  
 
-import {
-    addAssignment,
-    deleteAssignment,
-    updateAssignment,
-    selectAssignment,
-  } from "../../../../Courses/Assignments/assignmentsReducer";
+function QuizFillBlankEditor({ question, setQuestions, onCancel }: any) {
+    const [quizQuestion, setQuizQuestion] = useState(question.question);
 
-// import * as client from "../../../../Courses/Assignments/client";  
-import { findAssignmentsForCourse, createAssignment } from "../../../../Courses/Assignments/client";
-
-import {
-    addQuiz,
-    deleteQuiz,
-    updateQuiz,
-    selectQuiz,
-    setQuizzes,
-} from "../../reducer"
-
-import * as client from "../../client";  
-import { findQuizzesForCourse, createQuiz } from "../../client";
-
-function QuizFillBlankEditor({onCancel} : any) {
-    const { assignmentId, courseId } = useParams();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        findQuizzesForCourse(courseId)
-          .then((quizzes) =>
-            dispatch(selectQuiz(quizzes))
-        );
-      }, [courseId]);      
-    // const assignmentList = useSelector((state: KanbasState) => state.assignmentsReducer.assignments);
-    const quiz = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
-    interface Assignment {
-        _id: string;
-        title: string;
-        course: string;
-        category: string;
-        description: string;
-        isPublished: boolean;
-    }
-
-    interface Quiz {
-        _id: string;
-        title: string;
-        course: string;
-        description: string;
-        isPublished: boolean;
-        points: Number;
-        dueDate: Date;
-        availableFromDate: Date;
-        availableUntilDate: Date;
-        pts: Number;
-        Questions: Number;
-        shuffleAnswer: Boolean;
-        QuizType: String;
-        Minutes: Number;
-        AccessCode: Number;
-    }
-
-    const [quizInstructions, setQuizInstructions] = useState('');
-
-    const handleInstructionsChange = (value : any) => {
-        setQuizInstructions(value);
-        dispatch(updateQuiz({...quiz, description: value}));
-    };
-
-    const [quizQuestion, setQuizQuestion] = useState('');
     const handleQuestionChange = (value : any) => {
         setQuizQuestion(value);
-        // dispatch(updateAssignment({...assignment, description: value}));
     };
 
-    const [answers, setAnswers] = useState([{id: 1, text:''}]);
+    const [answers, setAnswers] = useState(question.fillBlank || []);
+
     const handleAddAnswer = () => {
         const newId = answers.length > 0 ? answers[answers.length - 1].id + 1 : 1;
-        setAnswers([...answers, {id: newId, text: ''}])
+        setAnswers([...answers, { id: "Fill"+newId, correctAnswers: '' }]);
     };
+
     const handleRemoveAnswer = (id : any) => {
-        setAnswers(answers.filter(answer => answer.id !== id));
+        setAnswers(answers.filter((answer: any) => answer.id !== id));
     };
+    const handleAnswerTextChange = (id: any, text: any) => {
+        setAnswers(answers.map((answer:any) => {
+            if (answer._id === id) {
+                return { ...answer, correctAnswers: text};
+            }
+            return text;
+        }));
+    };
+    
 
-    const handleAddQuiz = () => {
-        const newQuizDetails = {
-            ...quiz,
-            course: courseId,
+    const handleSave = async () => {
+        const updatedQuestion = {
+            ...question,
+            question: quizQuestion,
+            fillBlank: answers
         };
-        if(courseId) {
-            client.createQuiz(courseId, newQuizDetails).then((newQuizDetails) => {
-                dispatch(addQuiz(newQuizDetails));
-            });
+        try {
+            await client.updateQuestion(updatedQuestion);
+            setQuestions((updatedQuestions: any) => updatedQuestions.map((q:any) => q._id === updatedQuestion._id ? updatedQuestion : q));
+        } catch (error) {
+            console.error("Error updating question:", error);
+
         }
-      };
-
-      const handleUpdateQuiz = async () => {
-        const status = await client.updateQuiz(quiz);
-        dispatch(updateQuiz(quiz));
     };
-
-    const handleSave = () => {
-        
-    };
-
     return(
         <div>
             <form>
@@ -147,8 +73,8 @@ function QuizFillBlankEditor({onCancel} : any) {
                             Answers:</label>
                 </div>
 
-                {answers.map((answer, index) => (
-                    <div className="row g-3" style={{marginLeft:"20px", marginRight:"20px", marginTop:"5px" }}> 
+                {answers.map((answer: any) => (
+                    <div key={answer._id} className="row g-3" style={{marginLeft:"20px", marginRight:"20px", marginTop:"5px" }}> 
                                 <div className="col-md-6" style={{width:"200px"}}>
                                     <label style={{marginLeft: '5px'}}>
                                         Possible Answer:
@@ -158,10 +84,12 @@ function QuizFillBlankEditor({onCancel} : any) {
                                     <textarea
                                         className="form-control" 
                                         style={{height:"30px"}}
+                                        value={answer.correctAnswers}
+                                        onChange={(e) => handleAnswerTextChange(answer._id, e.target.value)}
                                     />  
                                 </div>    
                                 <div className="col-md-6">
-                                    <button className="ms-2" onClick={() => handleRemoveAnswer} style={{border:"none", backgroundColor:"white"}}><GoTrash/></button>
+                                    <button className="ms-2" onClick={() => handleRemoveAnswer(answer._id)} style={{border:"none", backgroundColor:"white"}}><GoTrash/></button>
                                 </div>
                                 
                     </div>
