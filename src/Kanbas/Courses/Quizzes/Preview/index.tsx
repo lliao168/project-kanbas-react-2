@@ -72,7 +72,7 @@ function QuizPreview() {
         availableUntilDate: Date;
         pts: Number;
         Questions: Number;
-        shuffleAnswer: Boolean;
+        shuffleAnswers: Boolean;
         QuizType: String;
         Minutes: Number;
         AccessCode: Number;

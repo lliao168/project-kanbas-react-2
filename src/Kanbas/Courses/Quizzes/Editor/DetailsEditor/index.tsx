@@ -23,6 +23,8 @@ import {
 import * as client from "../../client";  
 import { findQuizzesForCourse, createQuiz } from "../../client";
 
+
+
 function QuizDetailsEditor() {
     const { courseId, quizId } = useParams();
     const navigate = useNavigate();
@@ -38,15 +40,15 @@ function QuizDetailsEditor() {
     const [quizInstructions, setQuizInstructions] = useState(quiz ? quiz.description : '');
     const [quizPoint, updatePoint] = useState(quiz ? quiz.points : '');
     const [quizCategory, updateCategory] = useState(quiz ? quiz.category : '');
-    const [quizShuffle, updateShuffle] = useState(quiz ? quiz.shuffleAnswers : '');
-    const [checkTimeLimit, updateTimeLimitCheck] = useState(quiz ? quiz.timeLimitCheck : '');
-    const [quizTimeLimit, updateTimeLimit] = useState(quiz ? quiz.timeLimit : '');
-    const [quizMultipleAttempts, updateMultipleAttemples] = useState(quiz ? quiz.multipleAttempts : '');
-    const [quizCheckShowAns, updateChecksShowAns] = useState(quiz ? quiz.showCorrectAnswersCheck : '');
+    const [quizShuffle, updateShuffle] = useState(quiz ? quiz.shuffleAnswers : true);
+    const [checkTimeLimit, updateTimeLimitCheck] = useState(quiz ? quiz.timeLimitCheck : true);
+    const [quizTimeLimit, updateTimeLimit] = useState(quiz ? quiz.timeLimit : '20');
+    const [quizMultipleAttempts, updateMultipleAttemples] = useState(quiz ? quiz.multipleAttempts : false);
+    const [quizCheckShowAns, updateChecksShowAns] = useState(quiz ? quiz.showCorrectAnswersCheck : false);
     const [quizCorrectAnswer, updateShowCorrectAnswer] = useState(quiz ? quiz.showCorrectAnswers  : '');
-    const [quizSingleQues, updateSignQues] = useState(quiz ? quiz.OneQuestionatATime : '');
-    const [quizWebCam, updateWebCam] = useState(quiz ? quiz.WebCam : '');
-    const [lockQues, updateLockQues] = useState(quiz ? quiz.lockQuestionAfterAnswering : '');
+    const [quizSingleQues, updateSignQues] = useState(quiz ? quiz.OneQuestionAtATime : true);
+    const [quizWebCam, updateWebCam] = useState(quiz ? quiz.WebCam : false);
+    const [lockQues, updateLockQues] = useState(quiz ? quiz.lockQuestionAfterAnswering : false);
     const [quizDueDate, updateDueDate] = useState(quiz ? quiz.dueDate : '');
     const [quizAvailableFromDate, updateAvailableFromDate] = useState(quiz ? quiz.availableFromDate : '');
     const [quizUntilDate, updateUntilDate] = useState(quiz ? quiz.availableUntilDate : '');
@@ -83,17 +85,23 @@ function QuizDetailsEditor() {
     }
     const handleTimeLimit = (value: number) => {
         updateTimeLimit(value);
-        dispatch(updateQuiz({ ...quiz, timeLimit: value }));
+        dispatch(updateQuiz({ ...quiz, Minutes: value }));
     }
     const handleMultiAttemps = (e: any) => {
         const isChecked = e.target.checked;
         updateMultipleAttemples(isChecked);
         dispatch(updateQuiz({ ...quiz, multipleAttempts: isChecked }));
     }
+    const handleUpdateCheckShowAns = (e: any) => {
+        const isChecked = e.target.checked;
+        updateChecksShowAns(isChecked);
+        dispatch(updateQuiz({ ...quiz, showCorrectAnswersCheck: isChecked }));
+    }
+
     const handleSingleQues = (e: any) => {
         const isChecked = e.target.checked;
         updateSignQues(isChecked);
-        dispatch(updateQuiz({ ...quiz, OneQuestionatATime: isChecked }));
+        dispatch(updateQuiz({ ...quiz, OneQuestionAtATime: isChecked }));
     }
     const handleWebCam = (e: any) => {
         const isChecked = e.target.checked;
@@ -213,12 +221,12 @@ function QuizDetailsEditor() {
 
                     <div className="row" >
                         <label htmlFor="Quiz-group" className="col-sm-2  
-                                            col-form-label col-form-label-sm">Quiz Group</label>
+                                            col-form-label col-form-label-sm">Assignment Group</label>
                         <div className="col-sm">
                             <select className="form-select"
-                                onChange={(e) => handleQuizCategory(e.target.value)}>
+                                 onChange={(e) => dispatch(selectQuiz({...quiz, category: e.target.value}))}>
                                 <option value="QUIZZES" selected={quizCategory === "QUIZZES"}>QUIZZES</option>
-                                <option value="QuizS" selected={quizCategory === "QuizS"}>QuizS</option>
+                                <option value="QuizS" selected={quizCategory === "ASSIGNMENTS"}>ASSIGNMENTS</option>
                                 <option value="EXAM" selected={quizCategory === "EXAM"}>EXAM</option>
                                 <option value="PROJECT" selected={quizCategory === "PROJECT"}>PROJECT</option>
                             </select>
@@ -266,7 +274,7 @@ function QuizDetailsEditor() {
                                     Time Limit
                                 </label>
                                 <input type="number"
-                                    disabled={!checkTimeLimit}
+                                    // disabled={!checkTimeLimit}
                                     value={quizTimeLimit}
                                     className="form-control float-end me-2"
                                     onChange={(e) => handleTimeLimit(Number(e.target.value))}
@@ -310,7 +318,9 @@ function QuizDetailsEditor() {
                             <div className="form-check d-flex">
                                 <input className="form-check-input me-2" 
                                 type="checkbox" 
-                                id="gridCheck" />
+                                id="gridCheck" 
+                                checked= {quizCheckShowAns}
+                                onChange={handleUpdateCheckShowAns}/>
                                 <label className="form-check-label" htmlFor="gridCheck" style={{ marginRight: "50px" }}>
                                     Show Correct Answers
                                 </label>

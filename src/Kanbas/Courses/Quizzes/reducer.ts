@@ -11,10 +11,17 @@ interface Quiz {
   pts: Number;
   Questions: Number;
   isPublished: Boolean;
-  shuffleAnswer: Boolean;
+  shuffleAnswers: Boolean;
   QuizType: string; 
   Minutes: Number;
   AccessCode: Number;
+  timeLimitCheck: Boolean;
+  multipleAttempts: Boolean;
+  showCorrectAnswersCheck: Boolean;
+  showCorrectAnswers: Date;
+  OneQuestionAtATime: Boolean;
+  WebCam: Boolean;
+  lockQuestionAfterAnswering: Boolean;
 
 }
 
@@ -29,10 +36,17 @@ const initialState = {
   pts: 0, 
   Questions: 0, 
   isPublished: false, 
-  shuffleAnswer: true, 
+  shuffleAnswers: true, 
   QuizType: "Graded Quiz", 
   Minutes: 20, 
-  AccessCode: "123"},
+  AccessCode: "123",
+  timeLimitCheck: true,
+  multipleAttempts: false,
+  showCorrectAnswersCheck: false,
+  showCorrectAnswers: '',
+  OneQuestionAtATime: true,
+  WebCam: false,
+  lockQuestionAfterAnswering: false,},
 };
 
 const quizzesSlice = createSlice({

@@ -87,10 +87,17 @@ function Quizzes () {
         availableUntilDate: Date;
         pts: Number;
         Questions: Number;
-        shuffleAnswer: Boolean;
+        shuffleAnswers: Boolean;
         QuizType: String;
         Minutes: Number;
         AccessCode: Number;
+        timeLimitCheck: Boolean;
+        multipleAttempts: Boolean;
+        showCorrectAnswersCheck: Boolean;
+        showCorrectAnswers: Date;
+        OneQuestionAtATime: Boolean;
+        WebCam: Boolean;
+        lockQuestionAfterAnswering: Boolean;
     }
 
     const createDefaultQuiz = () => {
@@ -106,10 +113,17 @@ function Quizzes () {
             isPublished: false,
             pts: 0,
             Questions: 0,
-            shuffleAnswer: false,
+            shuffleAnswers: true,
             QuizType: "Graded Quiz",
             Minutes: 0,
-            AccessCode: ''
+            AccessCode: '',
+            timeLimitCheck: true,
+            multipleAttempts: false,
+            showCorrectAnswersCheck: false,
+            showCorrectAnswers: '',
+            OneQuestionAtATime: true,
+            WebCam: false,
+            lockQuestionAfterAnswering: false,
         };
     };
 
