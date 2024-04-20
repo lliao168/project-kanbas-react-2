@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { KanbasState } from "../../../store";
 import { PiPencil } from "react-icons/pi";
 import { FaCheckCircle, FaEllipsisV } from "react-icons/fa";
+import { FaArrowRightFromBracket, FaBan, FaChartSimple, FaCircle, FaCircleCheck, FaFileImport, FaXmark } from "react-icons/fa6";
+import { RiProhibitedLine } from "react-icons/ri";
 
 import {
     addQuiz,
@@ -58,6 +60,20 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
         isPublished: boolean;
     }
 
+    const [quizPublish, updatePublish] = useState(quiz ? quiz.isPublished : false);
+
+    const handlePublish = (quizId : any | null, e : any) => {
+        e.preventDefault(); 
+        if (!quizId) return;
+        const quiz = quizList.find(q => q._id === quizId);
+        if (quiz) {
+            const updatedQuiz = {...quiz, isPublished: !quiz.isPublished};
+            client.updateQuiz(updatedQuiz).then(() => {  
+                dispatch(updateQuiz(updatedQuiz));
+            })
+        }
+    };
+
     const handleEditClick = () => {
         navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}/Editor`);
     };
@@ -71,10 +87,13 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
         <div>
             <div style={{ margin: "5px", padding: "10px" }}>
                 <li className="list-group-item d-flex justify-content-end align-items-center">
-                    <button type="button" className="btn btn-success float end m-2">
-                        <FaCheckCircle />
-                        <span className="m-1">Published</span>
-                    </button>
+                        {quiz && quiz.isPublished ? (
+                        <button className="btn btn-success float-end m-2" onClick={(e) => handlePublish(quiz._id, e)}>
+                        <FaCircleCheck style={{color:"white"}} /> Published</button>
+                                            ) : (
+                        <button className="btn btn-light float-end m-2" onClick={(e) => handlePublish(quiz._id, e)} >
+                        <RiProhibitedLine className="text-muted me-1" />
+                        Unpublish</button>)}     
                     <button type="button" className="btn float btn-light end m-2" onClick={handlePreviewClick}>
                         Preview
                     </button>
