@@ -31,7 +31,12 @@ import * as client from "./client";
 function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
     const [quizQuestion, setQuizQuestion] = useState(question.question);
     const [choices, setChoices] = useState(question.multipleChoice || []);
+    const [originalQuestion] = useState(question.question);
 
+    const handleCancel = () => {
+        setQuizQuestion(originalQuestion);
+        onCancel();
+    };
     const handleQuestionChange = (value: string) => {
         setQuizQuestion(value);
     };
@@ -139,7 +144,7 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
                             className="btn btn-light"
                             onClick={(e) => {
                                 e.preventDefault(); 
-                                onCancel(); 
+                                handleCancel(); 
                             }}>
                             Cancel
                         </button>

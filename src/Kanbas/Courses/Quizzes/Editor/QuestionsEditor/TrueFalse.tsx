@@ -38,6 +38,12 @@ import { findQuizzesForCourse, createQuiz } from "../../client";
 function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
     const [quizQuestion, setQuizQuestion] = useState(question.question);
     const [correctAnswer, setCorrectAnswer] = useState<boolean | null>(question.trueFalse[0].isTrue !== undefined ? question.trueFalse[0].isTrue : null);
+    const [originalQuestion] = useState(question.question);
+
+    const handleCancel = () => {
+        setQuizQuestion(originalQuestion);
+        onCancel();
+    };
     console.log("correct", correctAnswer);
     const handleQuestionChange = (value: string) => {
         setQuizQuestion(value);
@@ -115,7 +121,7 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
                         className="btn btn-light"
                         onClick={(e) => {
                             e.preventDefault();
-                            onCancel();
+                            handleCancel();
                         }}>
                         Cancel
                     </button>

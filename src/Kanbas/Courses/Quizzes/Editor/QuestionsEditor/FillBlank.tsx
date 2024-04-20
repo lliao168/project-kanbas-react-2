@@ -4,11 +4,17 @@ import 'react-quill/dist/quill.snow.css';
 import { GoTrash } from "react-icons/go";
 import * as client from "./client";  
 
-function QuizFillBlankEditor({ question, setQuestions, onCancel }: any) {
+function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCancel }: any) {
     const [quizQuestion, setQuizQuestion] = useState(question.question);
 
     const handleQuestionChange = (value : any) => {
         setQuizQuestion(value);
+    };
+    const [originalQuestion] = useState(question.question);
+
+    const handleCancel = () => {
+        setQuizQuestion(originalQuestion);
+        onCancel();
     };
 
     const [answers, setAnswers] = useState(question.fillBlank || []);
@@ -103,7 +109,7 @@ function QuizFillBlankEditor({ question, setQuestions, onCancel }: any) {
                             className="btn btn-light"
                             onClick={(e) => {
                                 e.preventDefault(); 
-                                onCancel(); 
+                                handleCancel();
                             }}>
                             Cancel
                         </button>
