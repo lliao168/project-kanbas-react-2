@@ -13,7 +13,7 @@ import { FaXmark } from "react-icons/fa6";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CiSearch } from "react-icons/ci";
-
+import { GoTrash } from "react-icons/go";
 import {
     addAssignment,
     deleteAssignment,
@@ -37,7 +37,18 @@ import { findQuizzesForCourse, createQuiz } from "../../client";
 
 function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
     const [quizQuestion, setQuizQuestion] = useState(question.question);
-    const [correctAnswer, setCorrectAnswer] = useState<boolean | null>(question.trueFalse[0].isTrue !== undefined ? question.trueFalse[0].isTrue : null);
+    const [correctAnswer, setCorrectAnswer] = useState<boolean | null>(
+        question.trueFalse[0] && question.trueFalse[0].isTrue !== undefined
+            ? question.trueFalse[0].isTrue
+            : null
+    );
+
+    const [originalQuestion] = useState(question.question);
+
+    const handleCancel = () => {
+        setQuizQuestion(originalQuestion);
+        onCancel();
+    };
     console.log("correct", correctAnswer);
     const handleQuestionChange = (value: string) => {
         setQuizQuestion(value);
@@ -52,15 +63,25 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
             ...question,
             question: quizQuestion,
             trueFalse: {
-                _id: question.trueFalse[0]._id,
+                _id: 1,
                 isTrue: correctAnswer !== undefined ? correctAnswer : false
             }
         };
         try {
             await client.updateQuestion(updatedQuestion);
-            setQuestions((updatedQuestions: any) => updatedQuestions.map((q:any) => q._id === updatedQuestion._id ? updatedQuestion : q));
+            setQuestions((updatedQuestions: any) => updatedQuestions.map((q: any) => q._id === updatedQuestion._id ? updatedQuestion : q));
         } catch (error) {
             console.error("Error updating question:", error);
+        }
+    };
+
+    const handleDelete = async () => {
+        try {
+            await client.deleteQuestion(question._id);
+            const questionsData = await client.findQuestionsForQuiz(question.quizId);
+            setQuestions(questionsData);
+        } catch (error) {
+            console.error(error);
         }
     };
     return (
@@ -76,7 +97,7 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
                     <ReactQuill
                         theme="snow"
                         value={quizQuestion}
-                        onChange={handleQuestionChange}/>
+                        onChange={handleQuestionChange} />
                 </div>
                 <div>
                     <label htmlFor="Answers"
@@ -115,12 +136,20 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
                         className="btn btn-light"
                         onClick={(e) => {
                             e.preventDefault();
-                            onCancel();
+                            handleCancel();
                         }}>
                         Cancel
                     </button>
                     <button onClick={handleSave} className="btn btn-danger ms-2">
                         Update Question
+                    </button>
+                    <button className="ms-2"
+                        style={{ border: "none", backgroundColor: "white" }}
+                        onClick={() => {
+                            handleDelete();
+                        }}
+                    >
+                        <GoTrash />
                     </button>
                 </div>
             </form>

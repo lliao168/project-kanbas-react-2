@@ -21,12 +21,17 @@ import { Question, Blank, TrueFalse, Choice } from './client';
 function QuizQuestionsDetailEditor() {
     const { quizId} = useParams();
     const [questions, setQuestions] = useState<Question[]>([]);
+    const [originalQuestions, setOriginalQuestions] = useState<Question[]>([]);
+    const navigate = useNavigate();
+    const [question, setQuestion] = useState<Question>({
+        _id: "", title: "New Question", quizId: '', question: 'The Question Description', points: 0, questionType: "Multiple Choice"});
     
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
                 const questionsData = await client.findQuestionsForQuiz(quizId);
                 setQuestions(questionsData);
+                setOriginalQuestions(questionsData);
             } catch (error) {
                 console.error("Error fetching questions:", error);
             }
@@ -48,20 +53,27 @@ function QuizQuestionsDetailEditor() {
     const handleUpdateClick = async () => {
         try {
             await Promise.all(questions.map((question) => client.updateQuestion(question)));
-            console.log("Questions updated successfully");
+            console.log("Questions updated successfully and ready for preview");
         } catch (error) {
             console.error("Error updating questions:", error);
         }
     };
-
-        const handleCancel = () => {
-            console.log("User canceled update");
+    const handleCancel = () => {
+        setQuestions(originalQuestions);
     };
+
+    const handleCreateQuestion = async () => {
+        try {
+            const newQuestion = await client.createQuestion(quizId, question);
+            setQuestions([ ...questions, newQuestion]);
+        } catch (err) {
+            console.log("failed to create question", err);
+        }
+    }
     
     return(
         <div>
             {questions.map((question: any) => {
-                console.log(questions.length);
                         return (
                             <div key={question._id} className="row g-3 mt-2" style={{marginLeft:"20px", marginRight:"20px"}}>
                                 {question && (
@@ -112,7 +124,7 @@ function QuizQuestionsDetailEditor() {
                                             onCancel={handleCancel}/>
                                         )}
                                         {question.questionType === 'Fill In the Blank' && (
-                                            <QuizFillBlankEditor key={question._id} 
+                                            <QuizFillBlankEditor key={question._id}
                                             question={question}
                                             setQuestions={setQuestions}
                                             onCancel={handleCancel}/>
@@ -121,8 +133,50 @@ function QuizQuestionsDetailEditor() {
                                
                             </div>  
                         );  
-                })}      
-        </div>
+                        })}
+                <hr style={{color:"black", marginLeft:"20px", marginRight:"20px"}} />
+                <div className="d-flex justify-content-center mt-2">
+                    <button onClick ={handleCreateQuestion} className="btn btn-light ms-3">
+                        + New Question
+                    </button>
+                    <Link to={"#"} className="btn btn-light ms-4">
+                        + New Question Group
+                        </Link>
+                                    <Link to={"#"}
+                                      className="btn btn-light ms-4">
+                                      <CiSearch className="me-2"/>Find Questions
+                                  </Link>
+                      </div>
+        
+                        <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px"}} />
+        
+                       <div className="row g-3" style={{marginLeft:"20px", marginRight:"20px"}}>
+                           <div className="col-md-6 text-align:left">
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="checkbox" id="gridCheck"/>
+                                                   <label className="form-check-label" htmlFor="gridCheck">
+                                                     Notify users that this quiz has changed
+                                                    </label>
+                                               </div>
+                          </div>
+          
+                            <div className="col-md-6 text-align:left ">
+                                <button onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
+                                Save
+                                </button>
+                                <Link to={"#"} className="btn btn-light float-end ms-2"
+                                onClick={() => {handleUpdateClick()}} 
+                                >
+                                   Save & Publish
+                              </Link>
+                               <Link to={"#"}
+                                   onClick={() => {handleCancel()}} className="btn btn-light float-end">
+                                   Cancel
+                               </Link>
+                           </div>    
+                       </div>    
+                      
+               </div> 
     )
 }
 export default QuizQuestionsDetailEditor;

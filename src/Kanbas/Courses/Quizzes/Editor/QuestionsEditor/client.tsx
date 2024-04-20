@@ -18,7 +18,7 @@ export interface TrueFalse {
 
 export interface Blank {
     _id: string;
-    correctAnswers: string[];
+    correctAnswers: string;
     caseInsensitive: boolean;
 }
 export interface Question {
@@ -44,7 +44,7 @@ export const deleteQuestion = async (questionId: any) => {
         .delete(`${QUESTIONS_API}/${questionId}`);
     return response.data;
 };
-export const createQuestion = async (quizId: string, question: any) => {
+export const createQuestion = async (quizId: any, question: any) => {
     const response = await axios.post(
         `${QUIZZES_API}/${quizId}/questions`,
         question
