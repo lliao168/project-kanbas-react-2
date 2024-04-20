@@ -37,8 +37,14 @@ import {
     setQuizzes,
 } from "../reducer"
 
-import * as client from "../client";  
-import { findQuizzesForCourse, createQuiz } from "../client";
+import QuizMultipleChoiceEditor from '../Editor/QuestionsEditor/MultipleChoice';
+import QuizTrueFalseEditor from '../Editor/QuestionsEditor/TrueFalse';
+import QuizFillBlankEditor from '../Editor/QuestionsEditor/FillBlank';
+
+import * as client from "../Editor/QuestionsEditor/client";
+import { Question, Blank, TrueFalse, Choice } from '../Editor/QuestionsEditor/client';
+
+
 
 function formatDate(dateString : any) {
     if (!dateString) return "Invalid date"; 
@@ -57,29 +63,54 @@ function formatDate(dateString : any) {
 }
 
 function QuizPreview() {
-    const { assignmentId, courseId, quizId } = useParams();
+    const { assignmentId, courseId, quizId, questionId } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        findQuizzesForCourse(courseId)
-          .then((quizzes) =>
-            dispatch(selectQuiz(quizzes))
-        );
-      }, [courseId]);   
+    // useEffect(() => {
+    //     findQuizzesForCourse(courseId)
+    //       .then((quizzes) =>
+    //         dispatch(selectQuiz(quizzes))
+    //     );
+    //   }, [courseId]);   
+
     const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
-    // const assignment = useSelector((state: KanbasState) => state.assignmentsReducer.assignment);
     const quiz = quizList.find(
         (quiz) => quiz.course === courseId && quiz._id === quizId 
     );
-    interface Assignment {
-        _id: string;
-        title: string;
-        course: string;
-        category: string;
-        description: string;
-        isPublished: boolean;
-    }
+
+    const [questions, setQuestions] = useState<Question[]>([]);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const currentQuestion = questions[currentQuestionIndex];
+
+    useEffect(() => {
+        const fetchQuestions = async () => {
+            try {
+                const questionsData = await client.findQuestionsForQuiz(quizId);
+                setQuestions(questionsData);
+            } catch (error) {
+                console.error("Error fetching questions:", error);
+            }
+        };
+        fetchQuestions();
+    }, [quizId]);
+
+    const questionList = useSelector((state: KanbasState) => state.questionsReducer.questions);
+    const question = questionList.find((question) => question._id === questionId);
+    const quizQuestions = useSelector((state: KanbasState) => state.questionsReducer.questions.find((question : any) => question._id === questionId)?.questions);
+
+    const handleNext = () => {
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
+        } else {
+            console.log('End of Quiz');
+        }
+    };
+
+    const goToQuestion = (index : any) => {
+        setCurrentQuestionIndex(index);
+    };
+
 
     interface Quiz {
         _id: string;
@@ -108,6 +139,8 @@ function QuizPreview() {
     }
 
 
+
+
     return(
         <div className="mt-5">
             {quiz &&
@@ -117,7 +150,7 @@ function QuizPreview() {
             }
 
             <div style={{marginLeft:"20px", marginRight:"20px", backgroundColor:"#ffdddd", color: "crimson", padding:"10px", borderRadius:"5px"}}>
-                <AiOutlineExclamationCircle/>This is a preview of the published version of the quiz
+                <AiOutlineExclamationCircle className="me-2"/>This is a preview of the published version of the quiz
             </div>
 
             <div style={{marginLeft:"20px", marginRight:"20px"}} className="mt-2">
@@ -138,32 +171,99 @@ function QuizPreview() {
                     </div>
                     <div style={{width: "80%", marginTop: "20px"}}>
                         <div style={{backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px"}} className="d-flex">
-                            <div style={{fontSize: "1.2em", fontWeight: "bold", marginLeft:"20px"}}>Question 1</div>
-                            <div style={{fontSize: "1.2em", marginRight:"20px"}} className="flex-fill">
-                                <span className="float-end">1 pts</span>
-                            </div>
+                            <div style={{fontSize: "1.2em", fontWeight: "bold", marginLeft:"20px"}}>Question {currentQuestionIndex + 1}</div>
+                            {questions.map((question : any, index : any) => (  
+                                <div key={question._id} style={{fontSize: "1.2em", marginRight:"20px"}} className="flex-fill">
+                                    <span className="float-end">{currentQuestion.points} pts</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
                 <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
                     <div style={{width: "80%", marginLeft: "60px"}}>
-                        <div className="d-grid gap-3 col-sm border border-1 p-4">
-                            <div style={{fontSize: "1.2em", marginLeft:"30px"}}>What is the date today?</div>
+                    {questions.map((question : any, index : any) => (    
+                        <div key={question._id} className="d-grid gap-3 col-sm border border-1 p-4">
+                            <div style={{fontSize: "1.2em", marginLeft:"30px"}}>{question.question}</div>
 
                             <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px", marginTop:"10px", marginBottom:"-5px"}} />
-                            
-                            <div style={{marginLeft:"40px"}}>
-                                <input type="radio" id="optionTrue" name="answer" value="true"></input>
-                                <label id="optionTrue" style={{marginLeft:"10px"}}>True</label>
-                            </div>
-                            <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px", marginTop:"-10px"}} />
-                            <div style={{marginLeft:"40px", marginTop:"-20px"}}>
-                                <input type="radio" id="optionFalse" name="answer" value="false"></input>
-                                <label id="optionFalse" style={{marginLeft:"10px"}}>False</label>
-                            </div>
-                        </div>
+                            {question.questionType === 'Multiple Choice' && (    
+                                    <ul className="list-group">
+                                        {question.multipleChoice.map((choice : any) => (
+                                            <li className="list-group-item" style={{border:"transparent"}} key={choice._id}>
+                                                <div style={{marginLeft:"30px"}}>
+                                                    <input type="radio" id={`option${choice._id}`} name={`answer${index}`}></input>
+                                                    <label htmlFor={`option${choice._id}`} style={{marginLeft:"10px"}}>{choice.text}</label>
+                                                </div>
+                                            </li>   
+                                        ))} 
+                                    </ul>   
+                                )} 
+                            {question.questionType === 'True/False' && (    
+                                <div>
+                                    <div style={{marginLeft:"40px"}}>
+                                        <input type="radio" id={`optionTrue${question._id}`} name={`answer${index}`}  value="true"></input>
+                                        <label htmlFor={`optionTrue${question._id}`} style={{marginLeft:"10px"}}>True</label>
+                                    </div>
+                                    <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px"}} />
+                                    <div style={{marginLeft:"40px"}}>
+                                        <input type="radio" id={`optionFalse${question._id}`} name={`answer${index}`}  value="false"></input>
+                                        <label htmlFor={`optionFalse${question._id}`} style={{marginLeft:"10px"}}>False</label>
+                                    </div>
+                                </div>
+                            )}
+                            {question.questionType === 'Fill In the Blank' && question.fillBlank.map((answer : any, ansIndex : any) => (
+                                        <li key={ansIndex} className="list-group-item" style={{border:"transparent"}}>
+                                            <div style={{marginLeft:"20px"}} className="d-flex">
+                                                <label id="answer1" style={{marginLeft:"10px", marginRight:"20px"}}>Answer: </label>
+                                                <input
+                                                id="answer1" className="form-control mb-2 w-25" />
+                                            </div>
+                                        </li>    
+                                ))}
+                        </div> 
+                    ))}   
                     </div>
                 </div>
+
+                {/* <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
+                    <div style={{ marginLeft:"30px", fontSize:"30px", marginTop:"20px"}}>
+                        <CgPentagonRight/>
+                    </div>
+                    <div style={{width: "80%", marginTop: "20px"}}>
+                            <div style={{backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px"}} className="d-flex">
+                                <div style={{fontSize: "1.2em", fontWeight: "bold", marginLeft:"20px"}}>Question 1</div>
+                            {questions.map((question : any, index : any) => (    
+                                <div key={question._id} style={{fontSize: "1.2em", marginRight:"20px"}} className="flex-fill">
+                                    <span className="float-end">{question.points} pts</span>
+                                </div>
+                            ))}
+                            </div>
+                    </div>
+                </div>
+                <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
+                    <div style={{width: "80%", marginLeft: "60px"}}>
+                    {questions.map((question : any, index : any) => (
+                            <div key={question._id} className="d-grid gap-3 col-sm border border-1 p-4">
+                                <div style={{fontSize: "1.2em", marginLeft:"30px"}}>{question.question}</div>
+                                <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px", marginTop:"10px", marginBottom:"-20px"}} />
+                                {question.questionType === 'Multiple Choice' && (    
+                                    <ul className="list-group">
+                                        {question.multipleChoice.map((choice : any) => (
+                                            <li className="list-group-item" style={{border:"transparent"}} key={choice._id}>
+                                                <div style={{marginLeft:"30px"}}>
+                                                    <input type="radio" id={`option${choice._id}`} name={`answer${index}`}></input>
+                                                    <label htmlFor={`option${choice._id}`} style={{marginLeft:"10px"}}>{choice.text}</label>
+                                                </div>
+                                            </li>   
+                                        ))} 
+                                    </ul>   
+                                )} 
+                            </div>
+                    ))}
+                    </div>
+                </div>
+
 
                 <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
                     <div style={{ marginLeft:"30px", fontSize:"30px", marginTop:"20px"}}>
@@ -172,74 +272,39 @@ function QuizPreview() {
                     <div style={{width: "80%", marginTop: "20px"}}>
                         <div style={{backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px"}} className="d-flex">
                             <div style={{fontSize: "1.2em", fontWeight: "bold", marginLeft:"20px"}}>Question 1</div>
-                            <div style={{fontSize: "1.2em", marginRight:"20px"}} className="flex-fill">
-                                <span className="float-end">1 pts</span>
-                            </div>
+                            {questions.map((question : any, index : any) => (    
+                                <div style={{fontSize: "1.2em", marginRight:"20px"}} className="flex-fill">
+                                    <span className="float-end">{question.points} pts</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
                 <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
                     <div style={{width: "80%", marginLeft: "60px"}}>
-                        <div className="d-grid gap-3 col-sm border border-1 p-4">
-                            <div style={{fontSize: "1.2em", marginLeft:"30px"}}>What is the date today?</div>
-
-                            <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px", marginTop:"10px", marginBottom:"-20px"}} />
-                            <ul className="list-group">
-                                <li className="list-group-item" style={{border:"transparent"}}>
-                                    <div style={{marginLeft:"30px"}}>
-                                        <input type="radio" id="optionA" name="answer"></input>
-                                        <label id="optionA" style={{marginLeft:"10px"}}>Option A</label>
-                                    </div>
-                                </li>    
-                            </ul>    
-                            {/* <div style={{marginLeft:"30px"}}>
-                                <input type="radio" id="optionB" name="answer"></input>
-                                <label id="optionB" style={{marginLeft:"10px"}}>Option B</label>
+                    {questions.map((question : any, index : any) => (
+                            <div  key={question._id} className="d-grid gap-3 col-sm border border-1 p-4">
+                                <div style={{fontSize: "1.2em", marginLeft:"30px"}}>{question._id}</div>
+                                <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px", marginTop:"10px", marginBottom:"-5px"}} />
+                                <ul className="list-group">
+                                {question.questionType === 'Fill In the Blank' && question.fillBlank.map((answer : any, ansIndex : any) => (
+                                        <li key={ansIndex} className="list-group-item" style={{border:"transparent"}}>
+                                            <div style={{marginLeft:"20px"}} className="d-flex">
+                                                <label id="answer1" style={{marginLeft:"10px", marginRight:"20px"}}>Answer: </label>
+                                                <input
+                                                id="answer1" className="form-control mb-2 w-25" />
+                                            </div>
+                                        </li>    
+                                ))}
+                                </ul>    
                             </div>
-                            <div style={{marginLeft:"30px"}}>
-                                <input type="radio" id="optionC" name="answer"></input>
-                                <label id="optionC" style={{marginLeft:"10px"}}>Option C</label>
-                            </div> */}
-                        </div>
+                    ))}
                     </div>
-                </div>
-
-
-                <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
-                    <div style={{ marginLeft:"30px", fontSize:"30px", marginTop:"20px"}}>
-                        <CgPentagonRight/>
-                    </div>
-                    <div style={{width: "80%", marginTop: "20px"}}>
-                        <div style={{backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px"}} className="d-flex">
-                            <div style={{fontSize: "1.2em", fontWeight: "bold", marginLeft:"20px"}}>Question 1</div>
-                            <div style={{fontSize: "1.2em", marginRight:"20px"}} className="flex-fill">
-                                <span className="float-end">1 pts</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="d-flex" style={{marginLeft:"20px", marginRight:"20px"}}>
-                    <div style={{width: "80%", marginLeft: "60px"}}>
-                        <div className="d-grid gap-3 col-sm border border-1 p-4">
-                            <div style={{fontSize: "1.2em", marginLeft:"30px"}}>What is the date today?</div>
-
-                            <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px", marginTop:"10px", marginBottom:"-5px"}} />
-                            <ul className="list-group">
-                                <li className="list-group-item" style={{border:"transparent"}}>
-                                    <div style={{marginLeft:"20px"}} className="d-flex">
-                                        <label id="answer1" style={{marginLeft:"10px", marginRight:"20px"}}>Answer: </label>
-                                        <input
-                                        id="answer1" className="form-control mb-2 w-25" />
-                                    </div>
-                                </li>    
-                            </ul>    
-                        </div>
-                    </div>
-                </div>
+                </div> */}
 
                 <div className="row" style={{marginTop: "30px", marginLeft:"70px", width:"80%"}}>
                     <div className="col-sm">
-                        <button className="btn btn-light float-end" style={{marginLeft:"70px"}}>Next</button>
+                        <button className="btn btn-light float-end" style={{marginLeft:"70px"}} onClick={handleNext}>Next <GoTriangleRight/></button>
                     </div> 
                 </div>
 
@@ -267,9 +332,11 @@ function QuizPreview() {
                 <div style={{marginLeft:"70px", marginRight:"20px"}} className="mt-5">
                     <h4>Questions</h4>
                     <ul className="list-group">
-                        <li className="list-group-item" style={{border:"transparent"}}>
-                            <CiCircleQuestion/><Link to="#" style={{textDecoration:"none", color:"crimson"}} className="ms-2">Question 1</Link>
-                        </li>
+                    {questions.map((question, index) => (
+                            <li key={question._id} className="list-group-item" style={{border:"transparent"}}>
+                                <CiCircleQuestion/><Link to="#" onClick={() => goToQuestion(index)} style={{textDecoration:"none", color:"crimson"}} className="ms-2">Question {index + 1}</Link>
+                            </li>
+                    ))}
                     </ul>   
                 </div>
 
