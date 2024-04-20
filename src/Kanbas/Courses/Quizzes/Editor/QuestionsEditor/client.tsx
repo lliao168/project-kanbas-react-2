@@ -18,7 +18,7 @@ export interface TrueFalse {
 
 export interface Blank {
     _id: string;
-    correctAnswers: string[];
+    correctAnswers: string;
     caseInsensitive: boolean;
 }
 export interface Question {
