@@ -42,7 +42,7 @@ function QuizDetailsEditor() {
     const [quizCategory, updateCategory] = useState(quiz ? quiz.category : '');
     const [quizShuffle, updateShuffle] = useState(quiz ? quiz.shuffleAnswers : true);
     const [checkTimeLimit, updateTimeLimitCheck] = useState(quiz ? quiz.timeLimitCheck : true);
-    const [quizTimeLimit, updateTimeLimit] = useState(quiz ? quiz.timeLimit : '20');
+    const [quizTimeLimit, updateTimeLimit] = useState(quiz ? quiz.Minutes : '20');
     const [quizMultipleAttempts, updateMultipleAttemples] = useState(quiz ? quiz.multipleAttempts : false);
     const [quizCheckShowAns, updateChecksShowAns] = useState(quiz ? quiz.showCorrectAnswersCheck : false);
     const [quizCorrectAnswer, updateShowCorrectAnswer] = useState(quiz ? quiz.showCorrectAnswers  : '');

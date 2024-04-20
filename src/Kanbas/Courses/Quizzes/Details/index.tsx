@@ -111,7 +111,7 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Time Limit</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.timeLimitCheck ? quiz.timeLimit : "No Time Limit"}</p>
+                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz.Minutes} Minutes</p>
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Multiple Attempts</h3>

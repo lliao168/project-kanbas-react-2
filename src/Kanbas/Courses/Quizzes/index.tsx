@@ -116,7 +116,7 @@ function Quizzes () {
             Questions: 0,
             shuffleAnswers: true,
             QuizType: "Graded Quiz",
-            Minutes: 0,
+            Minutes: 20,
             AccessCode: '',
             timeLimitCheck: true,
             multipleAttempts: false,
