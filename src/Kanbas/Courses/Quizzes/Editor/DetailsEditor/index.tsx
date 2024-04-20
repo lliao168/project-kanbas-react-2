@@ -224,7 +224,7 @@ function QuizDetailsEditor() {
                                             col-form-label col-form-label-sm">Assignment Group</label>
                         <div className="col-sm">
                             <select className="form-select"
-                                 onChange={(e) => dispatch(selectQuiz({...quiz, category: e.target.value}))}>
+                                 onChange={(e) => handleQuizCategory(e.target.value)}>
                                 <option value="QUIZZES" selected={quizCategory === "QUIZZES"}>QUIZZES</option>
                                 <option value="QuizS" selected={quizCategory === "ASSIGNMENTS"}>ASSIGNMENTS</option>
                                 <option value="EXAM" selected={quizCategory === "EXAM"}>EXAM</option>

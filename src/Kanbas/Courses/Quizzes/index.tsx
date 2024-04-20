@@ -98,6 +98,7 @@ function Quizzes () {
         OneQuestionAtATime: Boolean;
         WebCam: Boolean;
         lockQuestionAfterAnswering: Boolean;
+        category: String;
     }
 
     const createDefaultQuiz = () => {
@@ -124,6 +125,7 @@ function Quizzes () {
             OneQuestionAtATime: true,
             WebCam: false,
             lockQuestionAfterAnswering: false,
+            category: "QUIZZES",
         };
     };
 

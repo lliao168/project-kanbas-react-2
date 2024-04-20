@@ -22,7 +22,7 @@ interface Quiz {
   OneQuestionAtATime: Boolean;
   WebCam: Boolean;
   lockQuestionAfterAnswering: Boolean;
-
+  category: String;
 }
 
 const initialState = {
@@ -46,7 +46,8 @@ const initialState = {
   showCorrectAnswers: '',
   OneQuestionAtATime: true,
   WebCam: false,
-  lockQuestionAfterAnswering: false,},
+  lockQuestionAfterAnswering: false,
+  category: "QUIZZES,"},
 };
 
 const quizzesSlice = createSlice({
