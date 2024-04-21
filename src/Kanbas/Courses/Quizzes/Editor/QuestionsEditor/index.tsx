@@ -18,14 +18,23 @@ import QuizTrueFalseEditor from './TrueFalse';
 import QuizFillBlankEditor from './FillBlank';
 import * as client from "./client"; 
 import { Question, Blank, TrueFalse, Choice } from './client';
+import * as clientQuiz from "../../client";  
+import { addQuiz, updateQuiz } from '../../reducer';
+
 function QuizQuestionsDetailEditor() {
-    const { quizId} = useParams();
+    const { courseId, quizId} = useParams();
     const [questions, setQuestions] = useState<Question[]>([]);
     const [originalQuestions, setOriginalQuestions] = useState<Question[]>([]);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [question, setQuestion] = useState<Question>({
         _id: "", title: "New Question", quizId: '', question: 'The Question Description', points: 0, questionType: "Multiple Choice"});
     
+    const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
+    const quiz = quizList.find(
+        (quiz) => quiz.course === courseId && quiz._id === quizId 
+    );
+
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
@@ -69,6 +78,23 @@ function QuizQuestionsDetailEditor() {
         } catch (err) {
             console.log("failed to create question", err);
         }
+    }
+
+    const handleSaveAndPublish = () => {
+        const updatedQuiz = {
+            ...quiz,
+            isPublished: !quiz.isPublished
+        };
+        if (quizId && quizId !== 'new') {
+            clientQuiz.updateQuiz(updatedQuiz).then(() => { 
+                dispatch(updateQuiz(updatedQuiz)); })
+        } else {
+            if (courseId) {
+            clientQuiz.createQuiz(courseId, updatedQuiz).then((createdQuiz) => { 
+                dispatch(addQuiz(createdQuiz)); })
+            }
+        }
+        navigate(`/Kanbas/Courses/${courseId}/Quizzes/`)
     }
     
     return(
@@ -164,8 +190,8 @@ function QuizQuestionsDetailEditor() {
                                 <button onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
                                 Save
                                 </button>
-                                <Link to={"#"} className="btn btn-light float-end ms-2"
-                                onClick={() => {handleUpdateClick()}} 
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Preview`} className="btn btn-light float-end ms-2"
+                                onClick={() => {handleUpdateClick(); handleSaveAndPublish()}} 
                                 >
                                    Save & Publish
                               </Link>
@@ -180,8 +206,6 @@ function QuizQuestionsDetailEditor() {
     )
 }
 export default QuizQuestionsDetailEditor;
- 
- 
     // const questionList = useSelector((state: KanbasState) => state.questionsReducer.questions);
     // const question = questionList.find(
     //     (question) => question.quiz === quizId && question._id === questionId

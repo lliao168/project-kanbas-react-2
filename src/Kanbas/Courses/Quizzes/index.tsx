@@ -178,6 +178,7 @@ function Quizzes () {
         quizId: null,
         selectedQuiz: null,
     });
+    
 
     const handleContextMenu = (event : any, quiz : any) => {
         event.preventDefault();
@@ -213,6 +214,7 @@ function Quizzes () {
         if (e) e.stopPropagation();
         setSelectedQuizId(null);
         setShowDeleteModal(false);
+        setContextMenu({ ...contextMenu, visible: false }); 
     };
 
     const handleDeleteQuiz = () => {
@@ -232,7 +234,6 @@ function Quizzes () {
             const updatedQuiz = {...quiz, isPublished: !quiz.isPublished};
             client.updateQuiz(updatedQuiz).then(() => {  
                 dispatch(updateQuiz(updatedQuiz));
-                
                 setContextMenu({...contextMenu, visible: false});
             })
         }
@@ -246,20 +247,6 @@ function Quizzes () {
             return quiz;
         });
         dispatch(updateQuiz(updatedQuizzes));  
-    };
-
-    const handleMenu = (action : any, quizId : any) => {
-        switch (action) {
-            case 'edit':
-                break;
-            case 'delete':
-                break;
-            case 'publish':
-                break;
-            default:
-                break;            
-        }
-        setContextMenu({...contextMenu, visible: false});
     };
 
     const renderContextMenu = () => {
@@ -304,11 +291,9 @@ function Quizzes () {
                 <li className="list-group-item" style={{borderBottom: "1px solid #ccc", backgroundColor:"#f0f0f0"}}>
                     <button type="button" onClick={(event) => {
                         event.stopPropagation();
-                        if (contextMenu.selectedQuiz && contextMenu.selectedQuiz) {
                             handlePublish(contextMenu.selectedQuiz);
-                        }
-                    }}>
-                        {contextMenu.selectedQuiz && contextMenu.selectedQuiz.isPublished ? 'Unpublish' : 'Publish'}
+                        }}>
+                        {contextMenu.selectedQuiz && contextMenu.selectedQuiz.isPublished ? "Unpublish" : "Publish"}
                     </button>
                 </li>
             </ul>

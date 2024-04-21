@@ -5,6 +5,7 @@ import { KanbasState } from '../../../store';
 import { FaCheckCircle, FaEllipsisV } from "react-icons/fa";
 import { RiProhibitedLine } from "react-icons/ri";
 import QuizDetailsEditor from './DetailsEditor';
+import { FaArrowRightFromBracket, FaBan, FaChartSimple, FaCircle, FaCircleCheck, FaFileImport, FaXmark } from "react-icons/fa6";
 
 import {
     addAssignment,
@@ -31,7 +32,7 @@ import { findQuizzesForCourse, createQuiz } from "../client";
 
 
 function QuizEditor () {
-    const { courseId } = useParams();
+    const { courseId, quizId } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -42,6 +43,7 @@ function QuizEditor () {
         );
       }, [courseId]);   
     const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
+    const quiz = quizList.find(q => q.course === courseId && q._id === quizId);   
     interface Assignment {
         _id: string;
         title: string;
@@ -105,6 +107,18 @@ function QuizEditor () {
 
     };
 
+    const handlePublish = (quizId : any | null, e : any) => {
+        e.preventDefault(); 
+        if (!quizId) return;
+        const quiz = quizList.find(q => q._id === quizId);
+        if (quiz) {
+            const updatedQuiz = {...quiz, isPublished: !quiz.isPublished};
+            client.updateQuiz(updatedQuiz).then(() => {  
+                dispatch(updateQuiz(updatedQuiz));
+            })
+        }
+    };
+
     return (
         <div>
 
@@ -112,9 +126,14 @@ function QuizEditor () {
                 <li className="list-group-item d-flex justify-content-end align-items-center buttons mt-3">
                     <div className="dropdown">
                         <span className="me-3">Points 0</span>
-                        <span className="me-2" style={{color:"grey"}}>
-                            <RiProhibitedLine className="me-2" style={{color:"grey"}}/>Not Published
+                        {quiz && quiz.isPublished ? (
+                         <span className="me-2" style={{color:"green"}}>
+                            <FaCheckCircle className="me-2" style={{color:"green"}}/>Published
                         </span>
+                                            ) : (
+                         <span className="me-2" style={{color:"grey"}}>
+                                <RiProhibitedLine className="me-2" style={{color:"grey"}}/>Not Published
+                        </span>)}     
                     </div>
                     <button type="button" className="btn btn-light float-end m-1">
                         <FaEllipsisV/>
