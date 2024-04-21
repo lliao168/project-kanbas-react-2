@@ -79,7 +79,8 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
     };
 
     const handlePreviewClick = () => {
-        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}/Preview`);
+        if(quiz?._id) {
+        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}/Preview`);}
     }
 
 
@@ -87,13 +88,17 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
         <div>
             <div style={{ margin: "5px", padding: "10px" }}>
                 <li className="list-group-item d-flex justify-content-end align-items-center">
-                        {quiz && quiz.isPublished ? (
+                        {quiz ? (
+                        quiz && quiz.isPublished ? (
                         <button className="btn btn-success float-end m-2" onClick={(e) => handlePublish(quiz._id, e)}>
                         <FaCircleCheck style={{color:"white"}} /> Published</button>
                                             ) : (
                         <button className="btn btn-light float-end m-2" onClick={(e) => handlePublish(quiz._id, e)} >
                         <RiProhibitedLine className="text-muted me-1" />
-                        Unpublish</button>)}     
+                        Unpublish</button>)
+                        ) : (
+                            <p>Loading...</p>
+                        )}    
                     <button type="button" className="btn float btn-light end m-2" onClick={handlePreviewClick}>
                         Preview
                     </button>

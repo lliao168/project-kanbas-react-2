@@ -150,14 +150,16 @@ function QuizDetailsEditor() {
         //     alert("All date fields ('Due to', 'Available from', and 'Until') are required to save this Quiz.");
         //     return;
         // }
-            if (quizId && quizId !== 'new') {
-                handleUpdateQuiz();
-            } else {
-                handleAddQuiz();
-            }
-            {quiz &&
-                navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`)
-            }
+        if (quiz?._id) {
+                if (quizId && quizId !== 'new') {
+                    handleUpdateQuiz();
+                } else {
+                    handleAddQuiz();
+                }
+                {quiz &&
+                    navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`)
+                }
+        }
     }
 
     const handleSaveAndPublish = () => {
