@@ -45,7 +45,8 @@ function QuizDetailsScreen() {
         .then((quizzes) =>
             dispatch(selectQuiz(quizzes))
         );
-  }, [courseId]);  
+  }, [courseId, dispatch]);  
+  
 const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
 
 // const quiz = quizList.find((quiz) => quiz.course === courseId && quiz._id === quizId );
@@ -97,7 +98,7 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
                         <RiProhibitedLine className="text-muted me-1" />
                         Unpublish</button>)
                         ) : (
-                            <p>Loading...</p>
+                            <p>Loading...</p> 
                         )}    
                     <button type="button" className="btn float btn-light end m-2" onClick={handlePreviewClick}>
                         Preview
@@ -119,43 +120,47 @@ const quiz = quizList.find(q => q.course === courseId && q._id === quizId);
                 <ul>
                     <li style={{ display: "flex", alignItems: "center"}} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Quiz Type</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" , textAlign:"left"}}>{quiz && quiz.QuizType}</p>
+                        <span style={{ margin: "0", fontSize: "15pt" , textAlign:"left"}}>{quiz && quiz.QuizType}</span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center", textAlign:"right" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Points</h3>
-                        <p style={{ margin: "0", fontSize: "15pt", textAlign:"left" }}>{quiz && quiz.points}</p>
+                        <span style={{ margin: "0", fontSize: "15pt", textAlign:"left" }}>{quiz && quiz.points}</span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Assignment Group</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.category}</p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.category}</span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Shuffle Answers</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.shuffleAnswers ? <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p> : <p style={{ margin: "0", fontSize: "15pt" }}>No</p>}</p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.shuffleAnswers ? <span style={{ margin: "0", fontSize: "15pt" }}>Yes</span>  : <span style={{ margin: "0", fontSize: "15pt" }}>No</span> }</span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Time Limit</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.Minutes} Minutes</p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.Minutes} Minutes</span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Multiple Attempts</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.multipleAttempts ? <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p> : <p style={{ margin: "0", fontSize: "15pt" }}>No</p>} </p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.multipleAttempts ? <span style={{ margin: "0", fontSize: "15pt" }}>Yes</span>  : <span style={{ margin: "0", fontSize: "15pt" }}>No</span> } </span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Show Correct Answers</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.showCorrectAnswersCheck ? <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p> : <p style={{ margin: "0", fontSize: "15pt" }}>No</p>} </p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.showCorrectAnswersCheck ? <span style={{ margin: "0", fontSize: "15pt" }}>Yes</span>  : <span style={{ margin: "0", fontSize: "15pt" }}>No</span> } </span> 
+                    </li>
+                    <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
+                        <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Access Code</h3>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.AccessCode} </span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">One Question at a Time</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.OneQuestionAtATime ? <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p> : <p style={{ margin: "0", fontSize: "15pt" }}>No</p>}</p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.OneQuestionAtATime ? <span style={{ margin: "0", fontSize: "15pt" }}>Yes</span>  : <span style={{ margin: "0", fontSize: "15pt" }}>No</span> }</span> 
                     </li>
                     <li style={{ display: "flex", alignItems: "center" }} className="mb-2">
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Webcam Required</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.WebCam ? <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p> : <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p>}</p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.WebCam ? <span style={{ margin: "0", fontSize: "15pt" }}>Yes</span>  : <span style={{ margin: "0", fontSize: "15pt" }}>No</span> }</span> 
                     </li>
                     <li className="mb-5" style={{ display: "flex", alignItems: "center" }}>
                         <h3 style={{ margin: "0 10px 0 0", fontSize:"20px", textAlign:"right"}} className="me-3">Lock Questions After Answering</h3>
-                        <p style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.lockQuestionAfterAnswering ? <p style={{ margin: "0", fontSize: "15pt" }}>Yes</p> : <p style={{ margin: "0", fontSize: "15pt" }}>No</p>}</p>
+                        <span style={{ margin: "0", fontSize: "15pt" }}>{quiz && quiz.lockQuestionAfterAnswering ? <span style={{ margin: "0", fontSize: "15pt" }}>Yes</span>  : <span style={{ margin: "0", fontSize: "15pt" }}>No</span> }</span> 
                     </li>
                 </ul>
             </div>

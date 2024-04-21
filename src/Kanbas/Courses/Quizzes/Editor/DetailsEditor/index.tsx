@@ -36,6 +36,12 @@ function QuizDetailsEditor() {
         (quiz) => quiz.course === courseId && quiz._id === quizId 
     );
 
+    const formattedDate = (isoDateStr : any) => {
+        if (!isoDateStr) return '';
+        const date = new Date(isoDateStr);
+        return date.toISOString().split('T')[0]; 
+    };
+
     const [quizType, updateType] = useState(quiz ? quiz.QuizType : '');
     const [quizTitle, updateTitle] = useState(quiz ? quiz.title : '');
     const [quizInstructions, setQuizInstructions] = useState(quiz ? quiz.description : '');
@@ -46,14 +52,15 @@ function QuizDetailsEditor() {
     const [quizTimeLimit, updateTimeLimit] = useState(quiz ? quiz.Minutes : '20');
     const [quizMultipleAttempts, updateMultipleAttemples] = useState(quiz ? quiz.multipleAttempts : false);
     const [quizCheckShowAns, updateChecksShowAns] = useState(quiz ? quiz.showCorrectAnswersCheck : false);
-    const [quizCorrectAnswer, updateShowCorrectAnswer] = useState(quiz ? quiz.showCorrectAnswers  : '');
+    const [quizCorrectAnswer, updateShowCorrectAnswer] = useState(quiz ? formattedDate(quiz.showCorrectAnswers)  : '');
     const [quizSingleQues, updateSignQues] = useState(quiz ? quiz.OneQuestionAtATime : true);
     const [quizWebCam, updateWebCam] = useState(quiz ? quiz.WebCam : false);
     const [lockQues, updateLockQues] = useState(quiz ? quiz.lockQuestionAfterAnswering : false);
-    const [quizDueDate, updateDueDate] = useState(quiz ? quiz.dueDate : '');
-    const [quizAvailableFromDate, updateAvailableFromDate] = useState(quiz ? quiz.availableFromDate : '');
-    const [quizUntilDate, updateUntilDate] = useState(quiz ? quiz.availableUntilDate : '');
+    const [quizDueDate, updateDueDate] = useState(quiz ? formattedDate(quiz.dueDate) : '');
+    const [quizAvailableFromDate, updateAvailableFromDate] = useState(quiz ? formattedDate(quiz.availableFromDate) : '');
+    const [quizUntilDate, updateUntilDate] = useState(quiz ? formattedDate(quiz.availableUntilDate) : '');
     const [quizPublish, updatePublish] = useState(quiz ? quiz.isPublished : false);
+    const [quizAccessCode, updateAccessCode] = useState(quiz ? quiz.AccessCode  : '');
 
     const handleTitleChange = (value: string) => {
         updateTitle(value);
@@ -102,7 +109,12 @@ function QuizDetailsEditor() {
 
     const handleUpdateShowAns = (value : any) => {
         updateShowCorrectAnswer(value);
-        dispatch(updateQuiz({ ...quiz, showCorrectAnswers: value }));
+        dispatch(updateQuiz({ ...quiz, showCorrectAnswers: new Date(value).toISOString() }));
+    }
+
+    const handleUpdateAccessCode = (value : any) => {
+        updateAccessCode(value);
+        dispatch(updateQuiz({ ...quiz, AccessCode: value }));
     }
 
     const handleSingleQues = (e: any) => {
@@ -123,15 +135,15 @@ function QuizDetailsEditor() {
 
     const handleDueDate = (value: string) => {
         updateDueDate(value);
-        dispatch(updateQuiz({ ...quiz, dueDate: value }));
+        dispatch(updateQuiz({ ...quiz, dueDate: new Date(value).toISOString() }));
     }
     const handleAvailableFromDate = (value: string) => {
         updateAvailableFromDate(value);
-        dispatch(updateQuiz({...quiz, availableFromDate: value}));
+        dispatch(updateQuiz({...quiz, availableFromDate: new Date(value).toISOString()}));
     }
     const handAvailableUntilDate = (value: string) => {
         updateUntilDate(value);
-        dispatch(updateQuiz({...quiz, availableUntilDate: value}));
+        dispatch(updateQuiz({...quiz, availableUntilDate: new Date(value).toISOString()}));
     }
 
     const handleAddQuiz = () => {
@@ -246,7 +258,7 @@ function QuizDetailsEditor() {
                             <select id="Quiz-group" className="form-select" value={quizCategory}
                                  onChange={(e) => handleQuizCategory(e.target.value)}>
                                 <option value="QUIZZES" >QUIZZES</option>
-                                <option value="QuizS" >ASSIGNMENTS</option>
+                                <option value="ASSIGNMENTS" >ASSIGNMENTS</option>
                                 <option value="EXAM" >EXAM</option>
                                 <option value="PROJECT">PROJECT</option>
                             </select>
@@ -348,7 +360,7 @@ function QuizDetailsEditor() {
                                     id="Show Answers Date"
                                     value={quizCorrectAnswer}
                                     onChange={(e) =>
-                                        handleUpdateShowAns(e.target.value) }
+                                        handleUpdateShowAns(e.target.value)}
 
                                 />
                             </div>
@@ -362,6 +374,9 @@ function QuizDetailsEditor() {
                             <input type="text"
                                 className="form-control"
                                 id="access code"
+                                value={quizAccessCode}
+                                onChange={(e) =>
+                                    handleUpdateAccessCode(e.target.value)}
                             />
                         </div>
                     </div>
@@ -455,14 +470,14 @@ function QuizDetailsEditor() {
                                     <input type="date" 
                                     className="form-control mb-4" 
                                     id="available-from" 
-                                    value={quiz?.availableFromDate}
+                                    value={quizAvailableFromDate}
                                         onChange={(e) => handleAvailableFromDate(e.target.value)
                                          } />
                                 </div>
 
                                 <div className="col-md-6" style={{ textAlign: "left" }}>
                                     <label htmlFor="until" className="form-label"><b>Until</b></label>
-                                    <input type="date" className="form-control mb-4" id="until" value={quiz?.availableUntilDate}
+                                    <input type="date" className="form-control mb-4" id="until" value={quizUntilDate}
                                         onChange={(e) =>
                                             handAvailableUntilDate(e.target.value) } />
                                 </div>
