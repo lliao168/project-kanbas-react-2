@@ -44,6 +44,12 @@ export const deleteQuestion = async (questionId: any) => {
         .delete(`${QUESTIONS_API}/${questionId}`);
     return response.data;
 };
+
+export const deleteAllQuestions = async (quizId: any) => {
+    const response = await axios.delete(`${QUIZZES_API}/${quizId}/questions`);
+    return response.data;
+}
+
 export const createQuestion = async (quizId: any, question: any) => {
     const response = await axios.post(
         `${QUIZZES_API}/${quizId}/questions`,

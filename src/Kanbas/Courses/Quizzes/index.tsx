@@ -10,7 +10,7 @@ import { KanbasState } from '../../store';
 import { Modal, Button} from 'react-bootstrap';
 import { RxRocket } from "react-icons/rx";
 import { RiProhibitedLine } from "react-icons/ri";
-
+import {deleteAllQuestions} from "../Quizzes/Editor/QuestionsEditor/client";
 import {
     addAssignment,
     deleteAssignment,
@@ -209,20 +209,23 @@ function Quizzes () {
         } 
     };
 
-    const handleCloseDeleteModal = (e?: any) => {   // e is optional and if provided can be of any type
+    const handleCloseDeleteModal = (e?: any) => {
         if (e) e.stopPropagation();
         setSelectedQuizId(null);
         setShowDeleteModal(false);
-        setContextMenu({ ...contextMenu, visible: false }); 
+        setContextMenu({...contextMenu, visible: false});
     };
 
-    const handleDeleteQuiz = () => {
-        // e.stopPropagation();
+    const handleDeleteQuiz = async () => {
         if (selectedQuizId) {
-            client.deleteQuiz(selectedQuizId._id).then((status) => {
+            try {
+                await deleteAllQuestions(selectedQuizId._id);
+                await client.deleteQuiz(selectedQuizId._id);
                 dispatch(deleteQuiz(selectedQuizId._id));
-            });
-            handleCloseDeleteModal();
+                handleCloseDeleteModal();
+            } catch (error) {
+                console.error("Error deleting quiz and associated questions:", error);
+            }
         }
     };
 
