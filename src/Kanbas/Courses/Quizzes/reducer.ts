@@ -33,7 +33,7 @@ const initialState = {
   dueDate: '', 
   availableFromDate: '', 
   availableUntilDate: '', 
-  pts: 0, 
+  pts: '', 
   Questions: 0, 
   isPublished: false, 
   shuffleAnswers: true, 

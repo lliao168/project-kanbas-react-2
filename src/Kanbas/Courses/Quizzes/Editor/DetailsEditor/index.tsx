@@ -52,6 +52,7 @@ function QuizDetailsEditor() {
     const [quizDueDate, updateDueDate] = useState(quiz ? quiz.dueDate : '');
     const [quizAvailableFromDate, updateAvailableFromDate] = useState(quiz ? quiz.availableFromDate : '');
     const [quizUntilDate, updateUntilDate] = useState(quiz ? quiz.availableUntilDate : '');
+    const [quizPublish, updatePublish] = useState(quiz ? quiz.isPublished : false);
 
     const handleTitleChange = (value: string) => {
         updateTitle(value);
@@ -144,23 +145,38 @@ function QuizDetailsEditor() {
     };
 
     const handleSave = () => {
-        if (!quiz.dueDate || !quiz.availableFromDate || !quiz.availableUntilDate) {
-            alert("All date fields ('Due to', 'Available from', and 'Until') are required to save this Quiz.");
-            return;
-        }
-        if (quizId && quizId !== 'new') {
-            handleUpdateQuiz();
-        } else {
-            // const newQuizDetails = {
-            //     ...quiz,
-            //     course: courseId,
-            //     category: Quiz.category
-            // };
-            // dispatch(addQuiz(newQuizDetails));
-            handleAddQuiz();
-        }
+        // if (!quiz.dueDate || !quiz.availableFromDate || !quiz.availableUntilDate) {
+        //     alert("All date fields ('Due to', 'Available from', and 'Until') are required to save this Quiz.");
+        //     return;
+        // }
+        
+            if (quizId && quizId !== 'new') {
+                handleUpdateQuiz();
+            } else {
+                handleAddQuiz();
+            }
+            {quiz &&
+                navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`)
+            }
+    }
 
-        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`)
+    const handleSaveAndPublish = () => {
+        const updatedQuiz = {
+            ...quiz,
+            isPublished: !quiz.isPublished
+        };
+        if (quizId && quizId !== 'new') {
+            client.updateQuiz(updatedQuiz).then(() => { 
+                dispatch(updateQuiz(updatedQuiz)); 
+                navigate(`/Kanbas/Courses/${courseId}/Quizzes/`); })
+        } else {
+            if (courseId) {
+             client.createQuiz(courseId, updatedQuiz).then((createdQuiz) => { 
+                dispatch(addQuiz(createdQuiz)); 
+                navigate(`/Kanbas/Courses/${courseId}/Quizzes/`); })
+            }
+        }
+        navigate(`/Kanbas/Courses/${courseId}/Quizzes/`)
     }
 
     useEffect(() => {
@@ -416,7 +432,7 @@ function QuizDetailsEditor() {
                                 <div className="col-12" style={{ textAlign: "left" }}>
                                     <label htmlFor="Due"
                                         className="form-label"><b>
-                                            Due to</b></label>
+                                            Due</b></label>
                                     <input type="date"
                                         className="form-control"
                                         id="due-date"
@@ -472,7 +488,7 @@ function QuizDetailsEditor() {
                         <button className="btn btn-danger ms-2 float-end" onClick={handleSave}>
                             Save
                         </button>
-                        <Link to={"#"} className="btn btn-light float-end ms-2">
+                        <Link to={`/Kanbas/Courses/${courseId}/Quizzes`} className="btn btn-light float-end ms-2" onClick={handleSaveAndPublish}>
                             Save & Publish
                         </Link>
                         <Link to={`/Kanbas/Courses/${courseId}/Quizzes`}

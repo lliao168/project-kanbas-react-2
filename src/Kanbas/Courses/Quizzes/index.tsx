@@ -213,6 +213,7 @@ function Quizzes () {
         if (e) e.stopPropagation();
         setSelectedQuizId(null);
         setShowDeleteModal(false);
+        setContextMenu({ ...contextMenu, visible: false }); 
     };
 
     const handleDeleteQuiz = () => {
