@@ -186,9 +186,11 @@ function QuizQuestionsDetailEditor() {
                           </div>
           
                             <div className="col-md-6 text-align:left ">
+                              { quiz &&  
                                 <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
                                 Save
                                 </Link>
+                              }
                                 
                                 <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Preview`} className="btn btn-light float-end ms-2"
                                 onClick={() => {handleUpdateClick();  handleSaveAndPublish()}} 
