@@ -82,7 +82,7 @@ function QuizQuestionsDetailEditor() {
     const handleSaveAndPublish = () => {
         const updatedQuiz = {
             ...quiz,
-            isPublished: !quiz.isPublished
+            isPublished: quiz.isPublished ? quiz.isPublished : true
         };
         if (quizId && quizId !== 'new') {
             clientQuiz.updateQuiz(updatedQuiz).then(() => { 
@@ -186,9 +186,9 @@ function QuizQuestionsDetailEditor() {
                           </div>
           
                             <div className="col-md-6 text-align:left ">
-                                <button onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
                                 Save
-                                </button>
+                                </Link>
                                 
                                 <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Preview`} className="btn btn-light float-end ms-2"
                                 onClick={() => {handleUpdateClick();  handleSaveAndPublish()}} 

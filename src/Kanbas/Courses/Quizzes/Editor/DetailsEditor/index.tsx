@@ -149,7 +149,6 @@ function QuizDetailsEditor() {
         //     alert("All date fields ('Due to', 'Available from', and 'Until') are required to save this Quiz.");
         //     return;
         // }
-        
             if (quizId && quizId !== 'new') {
                 handleUpdateQuiz();
             } else {
@@ -163,7 +162,7 @@ function QuizDetailsEditor() {
     const handleSaveAndPublish = () => {
         const updatedQuiz = {
             ...quiz,
-            isPublished: !quiz.isPublished
+            isPublished: quiz.isPublished ? quiz.isPublished : true
         };
         if (quizId && quizId !== 'new') {
             client.updateQuiz(updatedQuiz).then(() => { 
