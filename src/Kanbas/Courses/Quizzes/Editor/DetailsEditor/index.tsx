@@ -12,6 +12,7 @@ import { RiProhibitedLine } from "react-icons/ri";
 import { FaXmark } from "react-icons/fa6";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+
 import {
     addQuiz,
     deleteQuiz,
@@ -160,21 +161,18 @@ function QuizDetailsEditor() {
     }
 
     const handleSaveAndPublish = () => {
+        if (!quiz) {
+            console.error('Quiz details are undefined');
+            return; 
+        }
+    
         const updatedQuiz = {
             ...quiz,
             isPublished: quiz.isPublished ? quiz.isPublished : true
         };
-        if (quizId && quizId !== 'new') {
-            client.updateQuiz(updatedQuiz).then(() => { 
-                dispatch(updateQuiz(updatedQuiz)); 
-                navigate(`/Kanbas/Courses/${courseId}/Quizzes/`); })
-        } else {
-            if (courseId) {
-             client.createQuiz(courseId, updatedQuiz).then((createdQuiz) => { 
-                dispatch(addQuiz(createdQuiz)); 
-                navigate(`/Kanbas/Courses/${courseId}/Quizzes/`); })
-            }
-        }
+       
+        client.updateQuiz(updatedQuiz).then(() => { 
+        dispatch(updateQuiz(updatedQuiz)); })
         navigate(`/Kanbas/Courses/${courseId}/Quizzes/`)
     }
 
@@ -196,7 +194,7 @@ function QuizDetailsEditor() {
                 <div className="row g-3 justify-content-center">
 
                     <div className="col-12">
-                        <label htmlFor="Quiz Instructions"
+                        <label
                             className="form-label mt-2">
                             Quiz Instructions:</label>
                         <ReactQuill
@@ -212,11 +210,11 @@ function QuizDetailsEditor() {
                         <label htmlFor="quiz-type" className="col-sm-2  
                                             col-form-label col-form-label-sm">Quiz Type</label>
                         <div className="col-sm">
-                            <select className="form-select" onChange={(e) => handleQuizTypeChange(e.target.value)}>
-                                <option value="Graded Quiz" selected={quizType === "Graded Quiz"}>Graded Quiz</option>
-                                <option value="Practice Quiz" selected={quizType === "Practice Quiz"}>Practice Quiz</option>
-                                <option value="Graded Survey" selected={quizType === "Graded Survey"}>Graded Survey</option>
-                                <option value="Ungraded Survey" selected={quizType === "Ungraded Survey"}>Ungraded Survey</option>
+                            <select className="form-select" id="quiz-type" value={quizType} onChange={(e) => handleQuizTypeChange(e.target.value)}>
+                                <option value="Graded Quiz" >Graded Quiz</option>
+                                <option value="Practice Quiz" >Practice Quiz</option>
+                                <option value="Graded Survey" >Graded Survey</option>
+                                <option value="Ungraded Survey" >Ungraded Survey</option>
                             </select>
                         </div>
                     </div>
@@ -238,18 +236,18 @@ function QuizDetailsEditor() {
                         <label htmlFor="Quiz-group" className="col-sm-2  
                                             col-form-label col-form-label-sm">Assignment Group</label>
                         <div className="col-sm">
-                            <select className="form-select"
+                            <select id="Quiz-group" className="form-select" value={quizCategory}
                                  onChange={(e) => handleQuizCategory(e.target.value)}>
-                                <option value="QUIZZES" selected={quizCategory === "QUIZZES"}>QUIZZES</option>
-                                <option value="QuizS" selected={quizCategory === "ASSIGNMENTS"}>ASSIGNMENTS</option>
-                                <option value="EXAM" selected={quizCategory === "EXAM"}>EXAM</option>
-                                <option value="PROJECT" selected={quizCategory === "PROJECT"}>PROJECT</option>
+                                <option value="QUIZZES" >QUIZZES</option>
+                                <option value="QuizS" >ASSIGNMENTS</option>
+                                <option value="EXAM" >EXAM</option>
+                                <option value="PROJECT">PROJECT</option>
                             </select>
                         </div>
                     </div>
 
                     <div className="row" style={{ textAlign: "left" }}>
-                        <label htmlFor="display-grade" className="col-sm-2  
+                        <label className="col-sm-2  
                                             col-form-label col-form-label-sm"></label>
                         <div className="col-sm">
                             <label style={{ fontWeight: "bold" }}>
@@ -265,10 +263,10 @@ function QuizDetailsEditor() {
                             <div className="form-check">
                                 <input className="form-check-input"
                                     type="checkbox"
-                                    id="gridCheck"
+                                    id="shuffleAnswer"
                                     checked={quizShuffle}
                                     onChange={handleShuffle} />
-                                <label className="form-check-label" htmlFor="gridCheck">
+                                <label className="form-check-label" htmlFor="shuffleAnswer">
                                     Shuffle Answers
                                 </label>
                             </div>
@@ -282,10 +280,10 @@ function QuizDetailsEditor() {
                             <div className="form-check d-flex">
                                 <input className="form-check-input me-2"
                                     type="checkbox"
-                                    id="gridCheck"
+                                    id="timeLimitCheck"
                                     checked={checkTimeLimit}
                                     onChange={handleTimeLimitCheck} />
-                                <label className="form-check-label" htmlFor="gridCheck" style={{ marginRight: "50px" }}>
+                                <label className="form-check-label" htmlFor="timeLimitCheck" style={{ marginRight: "50px" }}>
                                     Time Limit
                                 </label>
                                 <input type="number"
@@ -303,7 +301,7 @@ function QuizDetailsEditor() {
 
 
                     <div className="row">
-                        <label htmlFor="display-grade" className="col-sm-2  
+                        <label className="col-sm-2  
                                             col-form-label col-form-label-sm"></label>
                         <div className="d-grid gap-3 col-sm border border-1 rounded">
                             <div className="row p-2" style={{ textAlign: "left" }}>
@@ -312,10 +310,10 @@ function QuizDetailsEditor() {
                                     <div className="form-check float-start">
                                         <input className="form-check-input" 
                                         type="checkbox" 
-                                        id="gridCheck"
+                                        id="multipleAttempts"
                                         checked= {quizMultipleAttempts}
                                         onChange={handleMultiAttemps} />
-                                        <label className="form-check-label" htmlFor="gridCheck">
+                                        <label className="form-check-label" htmlFor="multipleAttempts">
                                             Allow Multiple Attempts
                                         </label>
                                     </div>
@@ -331,10 +329,10 @@ function QuizDetailsEditor() {
                             <div className="form-check d-flex">
                                 <input className="form-check-input me-2" 
                                 type="checkbox" 
-                                id="gridCheck" 
+                                id="showCorrectAnswers" 
                                 checked= {quizCheckShowAns}
                                 onChange={handleUpdateCheckShowAns}/>
-                                <label className="form-check-label" htmlFor="gridCheck" style={{ marginRight: "50px" }}>
+                                <label className="form-check-label" htmlFor="showCorrectAnswers" style={{ marginRight: "50px" }}>
                                     Show Correct Answers
                                 </label>
                                 <input type="date"
@@ -364,10 +362,10 @@ function QuizDetailsEditor() {
                             <div className="form-check">
                                 <input className="form-check-input" 
                                 type="checkbox" 
-                                id="gridCheck"
+                                id="singleQues"
                                 checked={quizSingleQues} 
                                 onChange={handleSingleQues} />
-                                <label className="form-check-label" htmlFor="gridCheck">
+                                <label className="form-check-label" htmlFor="singleQues">
                                     One Question at a Time
                                 </label>
                             </div>
@@ -381,10 +379,10 @@ function QuizDetailsEditor() {
                             <div className="form-check">
                                 <input className="form-check-input" 
                                 type="checkbox" 
-                                id="gridCheck" 
+                                id="webCam" 
                                 checked = {quizWebCam}
                                 onChange={handleWebCam} />
-                                <label className="form-check-label" htmlFor="gridCheck">
+                                <label className="form-check-label" htmlFor="webCam">
                                     Webcam Required
                                 </label>
                             </div>
@@ -398,10 +396,10 @@ function QuizDetailsEditor() {
                             <div className="form-check">
                                 <input className="form-check-input" 
                                 type="checkbox" 
-                                id="gridCheck"
+                                id="lockQues"
                                 checked={lockQues}
                                 onChange={handleLockQues} />
-                                <label className="form-check-label" htmlFor="gridCheck">
+                                <label className="form-check-label" htmlFor="lockQues">
                                     Lock Questions After Answering
                                 </label>
                             </div>
@@ -409,14 +407,14 @@ function QuizDetailsEditor() {
                     </div>
 
                     <div className="row">
-                        <label htmlFor="display-grade" className="col-sm-2  
+                        <label className="col-sm-2  
                                             col-form-label col-form-label-sm">Assign</label>
 
                         <div className="d-grid gap-3 col-sm border border-1 rounded">
 
                             <div className="row g-3">
                                 <div className="col-12" style={{ textAlign: "left" }}>
-                                    <label htmlFor="Assign to"
+                                    <label
                                         className="form-label mt-3"><b>
                                             Assign to</b></label>
                                     <div className="d-grid gap-3 col-sm border border-1 rounded">
@@ -429,7 +427,7 @@ function QuizDetailsEditor() {
                                 </div>
 
                                 <div className="col-12" style={{ textAlign: "left" }}>
-                                    <label htmlFor="Due"
+                                    <label htmlFor="due-date"
                                         className="form-label"><b>
                                             Due</b></label>
                                     <input type="date"

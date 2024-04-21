@@ -1,7 +1,7 @@
 // import { useParams } from "react-router";
 import { courses } from "../../Kanbas/Database";
 import { Link, Navigate, Route, Routes, useParams, useLocation, useNavigate } from "react-router-dom";
-import { HiMiniBars3 } from "react-icons/hi2";
+// import { HiMiniBars3 } from "react-icons/hi2";
 import CourseNavigation from "./Navigation";
 import Modules from "./Modules";
 import { FaGlasses } from "react-icons/fa6";
@@ -37,6 +37,7 @@ import QuizDetailsScreen from "./Quizzes/Details";
 import QuizDetailsEditor from "./Quizzes/Editor/DetailsEditor";
 import QuizEditor from "./Quizzes/Editor";
 import QuizQuestionsDetailEditor from "./Quizzes/Editor/QuestionsEditor";
+import { LiaBarsSolid } from "react-icons/lia";
 
 import * as client from "./client";
 import { Course } from "./client";
@@ -117,7 +118,7 @@ function Courses() {
                         <li className="d-flex justify-content-end align-items-center" style={{ marginLeft: "20px"}}>
                                     <div className="col-auto">
                                         <button className="btn btn-primary border border-white" type="button" data-bs-toggle="collapse" data-bs-target="#collpaseKanbasNavigation" aria-expanded="false" aria-controls="collpaseKanbasNavigation" style={{backgroundColor: "white"}}>
-                                            <HiMiniBars3 style={{color:"crimson", fontWeight:"normal"}}/>
+                                            <LiaBarsSolid style={{color:"crimson", fontWeight:"normal"}}/>
                                         </button>
                                     </div>    
 
@@ -249,7 +250,7 @@ function Courses() {
                     <li className="list-group-item d-flex justify-content-start align-items-center" style={{backgroundColor:"black"}}>
                         <div className="col float-start">
                             <button className="btn btn-primary border border-black me-3" type="button" data-bs-toggle="collapse" data-bs-target="#collpaseKanbasNavigation" aria-expanded="false" aria-controls="collpaseKanbasNavigation" style={{backgroundColor: "black"}}>
-                                <HiMiniBars3 style={{color:"white"}}/>
+                                <LiaBarsSolid style={{color:"white"}}/>
                             </button>
                         </div>   
                         <div className="d-flex align-items-center flex-grow-1 p-2 ms-5"> 

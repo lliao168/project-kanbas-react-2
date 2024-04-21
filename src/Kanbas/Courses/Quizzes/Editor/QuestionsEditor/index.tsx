@@ -80,19 +80,18 @@ function QuizQuestionsDetailEditor() {
     }
 
     const handleSaveAndPublish = () => {
+        if (!quiz) {
+            console.error('Quiz details are undefined');
+            return; 
+        }
+    
         const updatedQuiz = {
             ...quiz,
             isPublished: quiz.isPublished ? quiz.isPublished : true
         };
-        if (quizId && quizId !== 'new') {
-            clientQuiz.updateQuiz(updatedQuiz).then(() => { 
-                dispatch(updateQuiz(updatedQuiz)); })
-        } else {
-            if (courseId) {
-            clientQuiz.createQuiz(courseId, updatedQuiz).then((createdQuiz) => { 
-                dispatch(addQuiz(createdQuiz)); })
-            }
-        }
+       
+        clientQuiz.updateQuiz(updatedQuiz).then(() => { 
+        dispatch(updateQuiz(updatedQuiz)); })
         navigate(`/Kanbas/Courses/${courseId}/Quizzes/`)
     }
     

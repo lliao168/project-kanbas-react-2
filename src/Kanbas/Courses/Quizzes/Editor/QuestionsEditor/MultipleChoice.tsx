@@ -114,7 +114,7 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
                     <label>Enter your question and multiple answers, then select the one correct answer.</label>
                 </div>
                 <div className="col-12">
-                    <label htmlFor="Quiz Question"
+                    <label
                         className="form-label mt-2" style={{ fontWeight: "bold" }}>
                         Question:</label>
                     <ReactQuill
@@ -124,7 +124,7 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
                     />
                 </div>
                 <div>
-                    <label htmlFor="Answers"
+                    <label
                         className="form-label mt-2" style={{ fontWeight: "bold" }}>
                         Answers:</label>
                 </div>
