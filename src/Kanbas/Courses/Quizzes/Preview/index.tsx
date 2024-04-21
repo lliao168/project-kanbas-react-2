@@ -247,7 +247,7 @@ function QuizPreview() {
                 <div style={{ width: "80%", marginTop: "20px", marginLeft: "70px" }} className="mt-5">
                     <div style={{ backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px" }} className="d-flex">
                         <div style={{ fontSize: "1.2em", marginLeft: "20px" }}>
-                            <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Editor`}><PiPencil /> Keep Editing This Quiz</Link>
+                            <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Editor`} style={{textDecoration: "none", color:"black"}}><PiPencil /> Keep Editing This Quiz</Link>
                             </div>
                     </div>
                 </div>
