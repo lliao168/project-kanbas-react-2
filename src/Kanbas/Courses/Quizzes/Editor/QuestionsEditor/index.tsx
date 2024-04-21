@@ -196,7 +196,7 @@ function QuizQuestionsDetailEditor() {
                                 >
                                    Save & Publish
                               </Link>
-                               <Link to={"#"}
+                               <Link to={`/Kanbas/Courses/${courseId}/Quizzes`}
                                    onClick={() => {handleCancel()}} className="btn btn-light float-end">
                                    Cancel
                                </Link>

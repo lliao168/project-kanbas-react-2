@@ -100,6 +100,11 @@ function QuizDetailsEditor() {
         dispatch(updateQuiz({ ...quiz, showCorrectAnswersCheck: isChecked }));
     }
 
+    const handleUpdateShowAns = (value : any) => {
+        updateShowCorrectAnswer(value);
+        dispatch(updateQuiz({ ...quiz, showCorrectAnswers: value }));
+    }
+
     const handleSingleQues = (e: any) => {
         const isChecked = e.target.checked;
         updateSignQues(isChecked);
@@ -341,6 +346,10 @@ function QuizDetailsEditor() {
                                     className="form-control float-end me-2"
                                     style={{ width: "50%" }}
                                     id="Show Answers Date"
+                                    value={quizCorrectAnswer}
+                                    onChange={(e) =>
+                                        handleUpdateShowAns(e.target.value) }
+
                                 />
                             </div>
                         </div>
