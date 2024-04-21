@@ -21,6 +21,7 @@ import { Question, Blank, TrueFalse, Choice } from './client';
 import * as clientQuiz from "../../client";  
 import { addQuiz, updateQuiz } from '../../reducer';
 
+
 function QuizQuestionsDetailEditor() {
     const {courseId, quizId} = useParams();
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -67,7 +68,9 @@ function QuizQuestionsDetailEditor() {
         }
     };
     const handleCancel = () => {
-        setQuestions(originalQuestions);
+        
+        // setQuestions(originalQuestions);
+        
     };
 
     const handleCreateQuestion = async () => {
@@ -196,8 +199,8 @@ function QuizQuestionsDetailEditor() {
                                 >
                                    Save & Publish
                               </Link>
-                               <Link to={`/Kanbas/Courses/${courseId}/Quizzes`}
-                                   onClick={() => {handleCancel()}} className="btn btn-light float-end">
+                               <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}`}
+                                   className="btn btn-light float-end">
                                    Cancel
                                </Link>
                            </div>    
