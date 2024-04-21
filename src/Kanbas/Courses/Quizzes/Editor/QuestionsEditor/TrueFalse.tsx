@@ -58,7 +58,9 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
         setCorrectAnswer(value);
     };
 
-    const handleSave = async () => {
+    const handleSave = async (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         const updatedQuestion = {
             ...question,
             question: quizQuestion,
@@ -75,7 +77,9 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = async (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         try {
             await client.deleteQuestion(question._id);
             const questionsData = await client.findQuestionsForQuiz(question.quizId);
@@ -145,8 +149,8 @@ function QuizTrueFalseEditor({ question, setQuestions, onCancel }: any) {
                     </button>
                     <button className="ms-2"
                         style={{ border: "none", backgroundColor: "white" }}
-                        onClick={() => {
-                            handleDelete();
+                        onClick={(e) => {
+                            handleDelete(e);
                         }}
                     >
                         <GoTrash />

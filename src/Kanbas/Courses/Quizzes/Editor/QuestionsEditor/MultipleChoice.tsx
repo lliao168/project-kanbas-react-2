@@ -63,7 +63,9 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
         }));
     };
 
-    const handleAddChoice = () => {
+    const handleAddChoice = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
         let newId;
         console.log("triggered");
         if(choices && choices.length > 0) {
@@ -78,11 +80,15 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
         setChoices([...choices, { _id: newId, text: '', isCorrect: false }]);
     };
 
-    const handleRemoveChoice = (id: any) => {
+    const handleRemoveChoice = (id: any, e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         setChoices(choices.filter((choice: any) => choice._id !== id));
     };
 
-    const handleSave = async () => {
+    const handleSave = async (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         const updatedQuestion = {
             ...question,
             question: quizQuestion,
@@ -97,7 +103,9 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = async (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         try {
             await client.deleteQuestion(question._id);
             const questionsData = await client.findQuestionsForQuiz(question.quizId);
@@ -155,7 +163,7 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
                             />
                         </div>
                         <div className="col-md-6">
-                            <button className="ms-2" onClick={(e) => handleRemoveChoice(choice._id)} style={{ border: "none", backgroundColor: "white" }}><GoTrash /></button>
+                            <button className="ms-2" onClick={(e) => handleRemoveChoice(choice._id, e)} style={{ border: "none", backgroundColor: "white" }}><GoTrash /></button>
                         </div>
 
                     </div>
@@ -179,8 +187,8 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
                     </button>
                     <button className="ms-2" 
                     style={{ border: "none", backgroundColor: "white" }}
-                    onClick = {() => {
-                        handleDelete();
+                    onClick = {(e) => {
+                        handleDelete(e);
                     }}
                     >
                         <GoTrash />

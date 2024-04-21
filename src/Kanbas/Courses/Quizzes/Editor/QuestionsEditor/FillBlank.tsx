@@ -19,7 +19,9 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
 
     const [answers, setAnswers] = useState(question.fillBlank || []);
 
-    const handleAddAnswer = () => {
+    const handleAddAnswer = (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         let newId;
         console.log("length", answers.length);
         if (answers && answers.length > 0) {
@@ -32,7 +34,9 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
         setAnswers([...answers, { _id: newId, correctAnswers: '', caseInsensitive: false }]);
     };
 
-    const handleRemoveAnswer = (id: any) => {
+    const handleRemoveAnswer = (id: any, e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         setAnswers(answers.filter((answer: any) => answer._id !== id));
     };
     const handleAnswerTextChange = (id: any, text: any) => {
@@ -45,7 +49,9 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
     };
 
 
-    const handleSave = async () => {
+    const handleSave = async (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         const updatedQuestion = {
             ...question,
             question: quizQuestion,
@@ -61,7 +67,9 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = async (e : any) => {
+        e.preventDefault();
+        e.stopPropagation();
         try {
             await client.deleteQuestion(question._id);
             const questionsData = await client.findQuestionsForQuiz(question.quizId);
@@ -114,7 +122,7 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
                             />
                         </div>
                         <div className="col-md-6">
-                            <button className="ms-2" onClick={() => handleRemoveAnswer(answer._id)} style={{ border: "none", backgroundColor: "white" }}><GoTrash /></button>
+                            <button className="ms-2" onClick={(e) => handleRemoveAnswer(answer._id, e)} style={{ border: "none", backgroundColor: "white" }}><GoTrash /></button>
                         </div>
 
                     </div>
@@ -137,8 +145,8 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
                     </button>
                     <button className="ms-2"
                         style={{ border: "none", backgroundColor: "white" }}
-                        onClick={() => {
-                            handleDelete();
+                        onClick={(e) => {
+                            handleDelete(e);
                         }}
                     >
                         <GoTrash />
