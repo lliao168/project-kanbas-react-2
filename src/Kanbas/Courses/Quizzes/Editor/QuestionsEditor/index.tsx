@@ -19,7 +19,7 @@ import QuizFillBlankEditor from './FillBlank';
 import * as client from "./client"; 
 import { Question, Blank, TrueFalse, Choice } from './client';
 function QuizQuestionsDetailEditor() {
-    const { quizId} = useParams();
+    const { courseId, quizId} = useParams();
     const [questions, setQuestions] = useState<Question[]>([]);
     const [originalQuestions, setOriginalQuestions] = useState<Question[]>([]);
     const navigate = useNavigate();
@@ -164,7 +164,8 @@ function QuizQuestionsDetailEditor() {
                                 <button onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
                                 Save
                                 </button>
-                                <Link to={"#"} className="btn btn-light float-end ms-2"
+                                
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Preview`} className="btn btn-light float-end ms-2"
                                 onClick={() => {handleUpdateClick()}} 
                                 >
                                    Save & Publish
