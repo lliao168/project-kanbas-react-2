@@ -135,7 +135,8 @@ function QuizFillBlankEditor({ originalQuestions, question, setQuestions, onCanc
                     <button
                         className="btn btn-light"
                         onClick={(e) => {
-                            // e.preventDefault();
+                            e.preventDefault();
+                            e.stopPropagation();
                             // handleCancel();
                             console.log("nothing needs to be changed");
                         }}>

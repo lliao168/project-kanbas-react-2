@@ -177,7 +177,8 @@ function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
                     <button
                         className="btn btn-light"
                         onClick={(e) => {
-                            // e.preventDefault();
+                            e.preventDefault();
+                            e.stopPropagation();
                             // handleCancel();
                             console.log("nothing needs to be changed");
                         }}>
