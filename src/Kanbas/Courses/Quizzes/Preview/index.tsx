@@ -62,7 +62,7 @@ function formatDate(dateString: any) {
     return formatter.format(date).replace(',', ' at');
 }
 
-function QuizPreview() {
+function QuizPreview({profile} : any) {
     const { assignmentId, courseId, quizId, questionId } = useParams();
 
     const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
@@ -141,18 +141,22 @@ function QuizPreview() {
 
     return (
         <div className="mt-5">
-            {quiz &&
-                <h1 style={{ marginLeft: "20px", marginRight: "20px" }} >
-                    {quiz.title}
-                </h1>
-            }
-            <div style={{ marginLeft: "20px", marginRight: "20px", backgroundColor: "#ffdddd", color: "crimson", padding: "10px", borderRadius: "5px" }}>
-                <AiOutlineExclamationCircle className="me-2" />This is a preview of the published version of the quiz
-            </div>
+            {profile && (profile.role === "FACULTY" || profile.role === "ADMIN") && (
+                <>
+                {quiz &&
+                    <h1 style={{ marginLeft: "20px", marginRight: "20px" }} >
+                        {quiz.title}
+                    </h1>
+                }
+                <div style={{ marginLeft: "20px", marginRight: "20px", backgroundColor: "#ffdddd", color: "crimson", padding: "10px", borderRadius: "5px" }}>
+                    <AiOutlineExclamationCircle className="me-2" />This is a preview of the published version of the quiz
+                </div>
 
-            <div style={{ marginLeft: "20px", marginRight: "20px" }} className="mt-2">
-                Started: {formatDate(new Date())}
-            </div>
+                <div style={{ marginLeft: "20px", marginRight: "20px" }} className="mt-2">
+                    Started: {formatDate(new Date())}
+                </div>
+                </>
+            )}
 
             <h1 style={{ marginLeft: "20px", marginRight: "20px" }} >
                 Quiz Instructions
@@ -244,26 +248,29 @@ function QuizPreview() {
                     </div>
                 </div>
 
-                <div style={{ width: "80%", marginTop: "20px", marginLeft: "70px" }} className="mt-5">
-                    <div style={{ backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px" }} className="d-flex">
-                        <div style={{ fontSize: "1.2em", marginLeft: "20px" }}>
-                            <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Editor`} style={{textDecoration: "none", color:"black"}}><PiPencil /> Keep Editing This Quiz</Link>
-                            </div>
+                
+                {profile && (profile.role === "FACULTY" || profile.role === "ADMIN") && (
+                    <>
+                    <div style={{ width: "80%", marginTop: "20px", marginLeft: "70px" }} className="mt-5">
+                        <div style={{ backgroundColor: "#f9f9f9", border: "solid 1px #ccc", padding: "10px" }} className="d-flex">
+                            <div style={{ fontSize: "1.2em", marginLeft: "20px" }}>
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Editor`} style={{textDecoration: "none", color:"black"}}><PiPencil /> Keep Editing This Quiz</Link>
+                                </div>
+                        </div>
                     </div>
-                </div>
 
-                <div style={{ marginLeft: "70px", marginRight: "20px" }} className="mt-5">
-                    <h4>Questions</h4>
-                    <ul className="list-group">
-                        {questions.map((question, index) => (
-                            <li key={question._id} className="list-group-item" style={{ border: "transparent" }}>
-                                <CiCircleQuestion /><Link to="#" onClick={() => goToQuestion(index)} style={{ textDecoration: "none", color: "crimson" }} className="ms-2">Question {index + 1}</Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-
+                    <div style={{ marginLeft: "70px", marginRight: "20px" }} className="mt-5">
+                        <h4>Questions</h4>
+                        <ul className="list-group">
+                            {questions.map((question, index) => (
+                                <li key={question._id} className="list-group-item" style={{ border: "transparent" }}>
+                                    <CiCircleQuestion /><Link to="#" onClick={() => goToQuestion(index)} style={{ textDecoration: "none", color: "crimson" }} className="ms-2">Question {index + 1}</Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    </>
+                )}
 
             </div>
         </div>

@@ -90,7 +90,7 @@ function Kanbas() {
                     <Route path="/Account/*" element={<Account />} />
                     <Route path="Dashboard" element={<Dashboard profile={profile}/>} />
                     {/* <Route path="Courses" element={<Courses />} /> */}
-                    <Route path="Courses/:courseId/*" element={<Courses/>}/>
+                    <Route path="Courses/:courseId/*" element={<Courses profile={profile}/>}/>
                 </Routes>
             </div>
         </div>

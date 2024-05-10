@@ -44,7 +44,7 @@ import { Course } from "./client";
 import QuizPreview from "./Quizzes/Preview";
 const API_BASE = process.env.REACT_APP_API_BASE;
 
-function Courses() {
+function Courses({profile} : any) {
         const { courseId } = useParams();
         const COURSES_API = `${API_BASE}/api/courses`;
         const [courses, setCourses] = useState<Course[]>([]);
@@ -445,14 +445,14 @@ function Courses() {
                             <Route path="Modules" element={<Modules/>} />
                             <Route path="Piazza" element={<h1>Piazza</h1>} />
                             <Route path="Zoom Meetings" element={<h1>Zoom Meetings</h1>} />
-                            <Route path="Assignments" element={<Assignments/>} />
+                            <Route path="Assignments" element={<Assignments profile={profile}/>} />
                             <Route path="Assignments/:assignmentId" element={<AssignmentEditor/>}/>
-                            <Route path="Quizzes" element={<Quizzes/>} />
+                            <Route path="Quizzes" element={<Quizzes profile={profile}/>} />
                             <Route path="Quizzes/:quizId" element={<QuizDetailsScreen/>}/>
                             <Route path="Quizzes/:quizId/Editor" element={<QuizEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/DetailsEditor" element={<QuizDetailsEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/QuestionsEditor" element={<QuizQuestionsDetailEditor/>}/>
-                            <Route path="Quizzes/:quizId/Preview" element={<QuizPreview/>}/>
+                            <Route path="Quizzes/:quizId/Preview" element={<QuizPreview profile={profile}/>}/>
                             <Route path="Grades" element={<Grades />} />
                             <Route path="People" element={<h1>People</h1>} />
                             <Route path="Panopto Video" element={<h1>Panopto Video</h1>} />

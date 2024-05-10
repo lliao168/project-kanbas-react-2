@@ -20,7 +20,7 @@ import {
 import * as client from "./client";
 import { findAssignmentsForCourse, createAssignment } from "./client";
 
-function Assignments() {
+function Assignments({ profile }: any) {
     const { courseId } = useParams();
     useEffect(() => {
         findAssignmentsForCourse(courseId)
@@ -42,14 +42,7 @@ function Assignments() {
         navigate(`/Kanbas/Courses/${courseId}/Assignments/${assignment._id}`);
     };
 
-    // const assignmentList = assignments.filter(
-    // (assignment) => assignment.course === courseId && assignment.category === "Assignment");
-    // const quizList = assignments.filter(
-    //     (assignment) => assignment.course === courseId && assignment.category === "Quiz");
-    // const examList = assignments.filter(
-    //     (assignment) => assignment.course === courseId && assignment.category === "Exam");    
-    // const projectList = assignments.filter(
-    //     (assignment) => assignment.course === courseId && assignment.category === "Project");
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -88,28 +81,32 @@ function Assignments() {
 
                             <input type="text" className="form-control w-25" id="points" placeholder="Search for Assignment" />
                         </div>
-                        <button type="button" className="btn btn-light float end m-2">
-                            + Group
-                        </button>
-                        <button type="button" className="btn btn-danger float end m-2"
-                            onClick={() => {
-                                const newAssignment = {
-                                    title: "New Assignment",
-                                    description: "New Assignment Description",
-                                    points: 100,
-                                    dueDate: '',
-                                    availableFromDate: '',
-                                    availableUntilDate: '',
-                                    category: '',
-                                };
-                                dispatch(selectAssignment(newAssignment));
-                                navigate(`/Kanbas/Courses/${courseId}/Assignments/new`)
-                            }}>
-                            + Assignments
-                        </button>
-                        <button type="button" className="btn btn-light float-end m-2">
-                            <FaEllipsisV />
-                        </button>
+                        {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                            <>
+                                <button type="button" className="btn btn-light float end m-2">
+                                    + Group
+                                </button>
+                                <button type="button" className="btn btn-danger float end m-2"
+                                    onClick={() => {
+                                        const newAssignment = {
+                                            title: "New Assignment",
+                                            description: "New Assignment Description",
+                                            points: 100,
+                                            dueDate: '',
+                                            availableFromDate: '',
+                                            availableUntilDate: '',
+                                            category: '',
+                                        };
+                                        dispatch(selectAssignment(newAssignment));
+                                        navigate(`/Kanbas/Courses/${courseId}/Assignments/new`)
+                                    }}>
+                                    + Assignments
+                                </button>
+                                <button type="button" className="btn btn-light float-end m-2">
+                                    <FaEllipsisV />
+                                </button>
+                            </>
+                        )}
                     </li>
 
                 </div>
@@ -120,66 +117,90 @@ function Assignments() {
                             <PiDotsSixVerticalBold style={{ fontSize: "1.3em" }} />
                             <FaCaretDown className="ms-2 me-2" />
                             Assignments
-
-                            <span className="float-end">
-                                <button className="btn btn-light rounded border border-light">
-                                    40% of Total
-                                </button>
-                                <FaPlus className="ms-2" />
-                                <FaEllipsisV className="ms-2" />
-                            </span>
+                            {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                                <span className="float-end">
+                                    <button className="btn btn-light rounded border border-light">
+                                        40% of Total
+                                    </button>
+                                    <FaPlus className="ms-2" />
+                                    <FaEllipsisV className="ms-2" />
+                                </span>
+                            )}
                         </div>
-                        <ul className="list-group">
-                            {assignmentList
-                                .filter((assignment) => assignment.course === courseId && assignment.category === "ASSIGNMENTS")
-                                .map((assignment, index) => (
-                                    <li key={index} className="list-group-item" onClick={() => { handleSelectAssignment(assignment) }}>
-                                        <PiDotsSixVerticalBold style={{ fontSize: "1.3em" }} />
-                                        <HiOutlinePencilSquare className="ms-3" style={{ color: "green" }} />
-                                        <Link to={`/Kanbas/Courses/${courseId}/Assignments/${assignment._id}`} style={{ textDecoration: "none", color: "black", fontWeight: "bold" }} className="ms-3" >{assignment.title}</Link>
-                                        <div className="ms-3 mb-2" style={{ flexWrap: "wrap", overflowWrap: "break-word" }}>
-                                            <Link to="#" className="" style={{ textDecoration: "none", color: "crimson", fontSize: "0.8em", marginLeft: "55px" }}>Multiple modules </Link>
-                                            <span style={{ color: "grey", fontSize: "0.8em" }}>| Due date: 2024-01-22 23:59:59 | 100pts</span>
-                                            <span className="float-end">
-                                                <FaCheckCircle className="text-success me-3" /><FaEllipsisV className="me-4" />
-                                            </span>
-                                            <button
-                                                className="btn btn-danger float-end me-2"
-                                                style={{ height: "25px", width: "50px", borderRadius: '5px' }}
-                                                onClick={(event) => {
-                                                    // e.preventDefault();
-                                                    event.stopPropagation();
-                                                    handleShowDeleteModal(assignment._id)
-                                                }
-                                                }
-                                            >
-                                                Delete
-                                            </button>
+                        {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                            <ul className="list-group">
+                                {assignmentList
+                                    .filter((assignment) => assignment.course === courseId && assignment.category === "ASSIGNMENTS")
+                                    .map((assignment, index) => (
+                                        <li key={index} className="list-group-item" onClick={() => { handleSelectAssignment(assignment) }}>
+                                            <PiDotsSixVerticalBold style={{ fontSize: "1.3em" }} />
+                                            <HiOutlinePencilSquare className="ms-3" style={{ color: "green" }} />
+                                            <Link to={`/Kanbas/Courses/${courseId}/Assignments/${assignment._id}`} style={{ textDecoration: "none", color: "black", fontWeight: "bold" }} className="ms-3" >{assignment.title}</Link>
+                                            <div className="ms-3 mb-2" style={{ flexWrap: "wrap", overflowWrap: "break-word" }}>
+                                                <Link to="#" className="" style={{ textDecoration: "none", color: "crimson", fontSize: "0.8em", marginLeft: "55px" }}>Multiple modules </Link>
+                                                <span style={{ color: "grey", fontSize: "0.8em" }}>| Due date: 2024-01-22 23:59:59 | 100pts</span>
+                                                <span className="float-end">
+                                                    <FaCheckCircle className="text-success me-3" /><FaEllipsisV className="me-4" />
+                                                </span>
+                                                <button
+                                                    className="btn btn-danger float-end me-2"
+                                                    style={{ height: "25px", width: "50px", borderRadius: '5px' }}
+                                                    onClick={(event) => {
+                                                        // e.preventDefault();
+                                                        event.stopPropagation();
+                                                        handleShowDeleteModal(assignment._id)
+                                                    }
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
 
-                                            <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} aria-labelledby="contained-modal-title-vcenter" centered>
-                                                <Modal.Header closeButton>
-                                                    <Modal.Title >Confirm Delete</Modal.Title>
-                                                </Modal.Header>
-                                                <Modal.Body>Are you sure you want to remove this assignment?</Modal.Body>
-                                                <Modal.Footer>
-                                                    <Button variant="primary"
-                                                        onClick={(event) => {
-                                                            handleDeleteAssignment(event);
-                                                        }
-                                                        }
-                                                    >
-                                                        Yes
-                                                    </Button>
-                                                    <Button variant="secondary"
-                                                        onClick={handleCloseDeleteModal}>
-                                                        No
-                                                    </Button>
-                                                </Modal.Footer>
-                                            </Modal>
-                                        </div>
+                                                <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} aria-labelledby="contained-modal-title-vcenter" centered>
+                                                    <Modal.Header closeButton>
+                                                        <Modal.Title >Confirm Delete</Modal.Title>
+                                                    </Modal.Header>
+                                                    <Modal.Body>Are you sure you want to remove this assignment?</Modal.Body>
+                                                    <Modal.Footer>
+                                                        <Button variant="primary"
+                                                            onClick={(event) => {
+                                                                handleDeleteAssignment(event);
+                                                            }
+                                                            }
+                                                        >
+                                                            Yes
+                                                        </Button>
+                                                        <Button variant="secondary"
+                                                            onClick={handleCloseDeleteModal}>
+                                                            No
+                                                        </Button>
+                                                    </Modal.Footer>
+                                                </Modal>
+                                            </div>
 
-                                    </li>))}
-                        </ul>
+                                        </li>
+                                    ))}
+                            </ul>
+                        )}
+
+                        {profile && (profile.role === "STUDENT" || profile.role === "USER") && (
+                            <ul className="list-group">
+                                {assignmentList
+                                    .filter((assignment) => assignment.course === courseId && assignment.category === "ASSIGNMENTS")
+                                    .map((assignment, index) => (
+                                        <li key={index} className="list-group-item">
+                                            <PiDotsSixVerticalBold style={{ fontSize: "1.3em" }} />
+                                            <HiOutlinePencilSquare className="ms-3" style={{ color: "green" }} />
+                                            <Link to={"#"} style={{ textDecoration: "none", color: "black", fontWeight: "bold" }} className="ms-3" >{assignment.title}</Link>
+                                            <div className="ms-3 mb-2" style={{ flexWrap: "wrap", overflowWrap: "break-word" }}>
+                                                <Link to="#" className="" style={{ textDecoration: "none", color: "crimson", fontSize: "0.8em", marginLeft: "55px" }}>Multiple modules </Link>
+                                                <span style={{ color: "grey", fontSize: "0.8em" }}>| Due date: 2024-01-22 23:59:59 | 100pts</span>
+                                            </div>
+
+                                        </li>
+                                    ))}
+                            </ul>
+                        )}
+
                     </li>
                 </ul>
             </div>

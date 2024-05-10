@@ -63,7 +63,7 @@ function formatDate(dateString : any) {
     return formatter.format(date);
 }
 
-function Quizzes () {
+function Quizzes ({profile} : any) {
     const { courseId } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -331,14 +331,17 @@ function Quizzes () {
                                   
                                   <input type="text" className="form-control w-25" id="points" placeholder="Search for Quiz"/>
                                 </div>
-                                  <button type="button" className="btn btn-danger float end m-1"
-                                  onClick={handleCreateQuiz}>
-                                    + Quiz
-                                  </button>
-                                  <button type="button" className="btn btn-light float-end">
-                                    <FaEllipsisV/>
-                                  </button>
-                                  
+                                {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                                    <>
+                                    <button type="button" className="btn btn-danger float end m-1"
+                                    onClick={handleCreateQuiz}>
+                                        + Quiz
+                                    </button>
+                                    <button type="button" className="btn btn-light float-end">
+                                        <FaEllipsisV/>
+                                    </button>
+                                    </>
+                                )}
                               </li>
                         
             </div>
@@ -351,40 +354,65 @@ function Quizzes () {
                         <span style={{fontWeight:"bold"}}>Assignment Quizzes</span>
                     
                     </div>
-                    <ul className="list-group">
-                        {quizList
-                        .filter((quiz) => quiz.course === courseId)
-                        .map((quiz, index) => (
-                        <li key={index} className="list-group-item">
-                            <PiDotsSixVerticalBold style={{fontSize:"1.3em"}}/> 
-                            <RxRocket className="ms-3" style={{color:"green"}}/>                           
-                            <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} style={{textDecoration:"none", color:"black", fontWeight:"bold"}} className="ms-3" >{quiz.title}</Link>
-                            <div className="ms-3 mb-2" style={{flexWrap:"wrap", overflowWrap:"break-word"}}>    
-                                <Link to="#" className="" style={{textDecoration: "none", color:"grey", fontSize:"0.8em", marginLeft:"55px"}}>{determineQuizAvailability(quiz.availableFromDate, quiz.availableUntilDate)}  </Link> 
-                                <span style={{color:"grey", fontSize:"0.8em"}}>| Due {formatDate(quiz.dueDate)}  </span>
-                                {quiz.isPublished && (
-                                    <>
-                                        <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.pts} pts  </span>
-                                        <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.Questions} Questions  </span>
-                                    </>
-                                )}
-                                <span className="float-end">
-                                    {quiz.isPublished ? (
-                                        <FaCheckCircle className="text-success me-3" onClick={() => handlePublish(quiz._id)}/>
-                                    ) : (
-                                        <RiProhibitedLine className="text-muted me-3" onClick={() => handlePublish(quiz._id)} />
+                    {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                        <ul className="list-group">
+                            {quizList
+                            .filter((quiz) => quiz.course === courseId)
+                            .map((quiz, index) => (
+                            <li key={index} className="list-group-item">
+                                <PiDotsSixVerticalBold style={{fontSize:"1.3em"}}/> 
+                                <RxRocket className="ms-3" style={{color:"green"}}/>                           
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} style={{textDecoration:"none", color:"black", fontWeight:"bold"}} className="ms-3" >{quiz.title}</Link>
+                                <div className="ms-3 mb-2" style={{flexWrap:"wrap", overflowWrap:"break-word"}}>    
+                                    <Link to="#" className="" style={{textDecoration: "none", color:"grey", fontSize:"0.8em", marginLeft:"55px"}}>{determineQuizAvailability(quiz.availableFromDate, quiz.availableUntilDate)}  </Link> 
+                                    <span style={{color:"grey", fontSize:"0.8em"}}>| Due {formatDate(quiz.dueDate)}  </span>
+                                    {quiz.isPublished && (
+                                        <>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.pts} pts  </span>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.Questions} Questions  </span>
+                                        </>
                                     )}
-                                    <button onClick={(e) => handleContextMenu(e, quiz._id)} style={{backgroundColor:"white"}}>
-                                        <FaEllipsisV className="me-4"/>
-                                    </button>  
-                                    {renderContextMenu()}  
-                                </span>
-                            </div>    
-                            
-                        </li>))}
-                    </ul>
-                </li>
+                                    <span className="float-end">
+                                            {quiz.isPublished ? (
+                                                <FaCheckCircle className="text-success me-3" onClick={() => handlePublish(quiz._id)}/>
+                                            ) : (
+                                                <RiProhibitedLine className="text-muted me-3" onClick={() => handlePublish(quiz._id)} />
+                                            )}
+                                            <button onClick={(e) => handleContextMenu(e, quiz._id)} style={{backgroundColor:"white"}}>
+                                                <FaEllipsisV className="me-4"/>
+                                            </button>  
+                                            {renderContextMenu()}  
+                                    </span>
+                                </div>    
+                            </li>
+                            ))}
+                        </ul>
+                    )}
 
+                    {profile && (profile.role === "STUDENT" || profile.role === "USER") && (
+                        <ul className="list-group">
+                            {quizList
+                            .filter((quiz) => quiz.course === courseId)
+                            .map((quiz, index) => (
+                            <li key={index} className="list-group-item">
+                                <PiDotsSixVerticalBold style={{fontSize:"1.3em"}}/> 
+                                <RxRocket className="ms-3" style={{color:"green"}}/>                       
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}/Preview`} style={{textDecoration:"none", color:"black", fontWeight:"bold"}} className="ms-3" >{quiz.title}</Link>
+                                <div className="ms-3 mb-2" style={{flexWrap:"wrap", overflowWrap:"break-word"}}>    
+                                    <Link to="#" className="" style={{textDecoration: "none", color:"grey", fontSize:"0.8em", marginLeft:"55px"}}>{determineQuizAvailability(quiz.availableFromDate, quiz.availableUntilDate)}  </Link> 
+                                    <span style={{color:"grey", fontSize:"0.8em"}}>| Due {formatDate(quiz.dueDate)}  </span>
+                                    {quiz.isPublished && (
+                                        <>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.pts} pts  </span>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.Questions} Questions  </span>
+                                        </>
+                                    )}
+                                </div>    
+                            </li>
+                            ))}
+                        </ul>
+                    )}  
+                </li>
             </ul>
         </div>
         </>

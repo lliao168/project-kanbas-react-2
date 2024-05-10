@@ -27,41 +27,14 @@ function ModuleList() {
             dispatch(setModules(modules))
         );
       }, [courseId]);    
-    // const modulesList = modules.filter((module) => module.course === courseId);
-    // const [selectedModule, setSelectedModule] = useState(modulesList[0]);
-    // const [moduleList, setModuleList] = useState<any[]>(modules);
-    // const [module, setModule] = useState({
-    //     _id: "0", name: "New Module",
-    //     description: "New Description",
-    //     course: courseId || "",
-    // });
-    // const addModule = (module: any) => {
-    //     const newModule = { ...module,
-    //       _id: new Date().getTime().toString() };
-    //     const newModuleList = [newModule, ...moduleList];
-    //     setModuleList(newModuleList);
-    // };
+    
     interface Lesson {
         _id: string;
         name: string;
         description: string;
         module?: string; // include other properties as needed and use '?' for optional properties
     }
-    // const deleteModule = (moduleId: string) => {
-    //     const newModuleList = moduleList.filter(
-    //       (module) => module._id !== moduleId );
-    //     setModuleList(newModuleList);
-    // };
-    // const updateModule = () => {
-    //     const newModuleList = moduleList.map((m) => {
-    //       if (m._id === module._id) {
-    //         return module;
-    //       } else {
-    //         return m;
-    //       }
-    //     });
-    //     setModuleList(newModuleList);
-    // };
+    
     const moduleList = useSelector((state: KanbasState) => 
         state.modulesReducer.modules);
     const module = useSelector((state: KanbasState) => 
@@ -85,6 +58,8 @@ function ModuleList() {
         const status = await client.updateModule(module);
         dispatch(updateModule(module));
     };
+
+    const [showAddModule, setShowAddModule] = useState(false);
    
     
     
@@ -105,7 +80,7 @@ function ModuleList() {
                             <li><a className="dropdown-item" href="#">Something else here</a></li>
                         </ul>
                     </div>
-                    <button type="button" className="btn btn-danger float-end m-1">+ Module</button>
+                    <button type="button" className="btn btn-danger float-end m-1"  onClick={() => setShowAddModule(!showAddModule)}>+ Module</button>
                     <button type="button" className="btn btn-light float-end m-1">
                         <FaEllipsisV/>
                     </button>
@@ -117,21 +92,23 @@ function ModuleList() {
             <ul className="list-group wd-modules">
                 {/* <li className="list-group-item" style={{backgroundColor:"white", border:"white"}}> */}
                     <div className="row g-3">
-                        <div className="col-md-6 d-flex align-items-center">
-                            <input className="form-control mb-2" 
-                            style={{border:"1px solid #d3d3d3", borderRadius: '5px', height:"35px"}}
-                            value={module.name} 
-                            onChange={(e) => 
-                                dispatch(setModule({ ...module, name: e.target.value }))
-                            } 
-                            />
-                            <button className="btn btn-primary mb-2 ms-2" onClick={handleUpdateModule} style={{height:"30px", width:"80px", borderRadius: '5px'}}>
-                                Update
-                            </button>
-                            <button className="btn btn-success float-end mb-2 ms-2" onClick={handleAddModule} style={{height:"30px", width:"50px", borderRadius: '5px'}}>
-                                    Add
-                            </button>
-                        </div>
+                    {showAddModule && (
+                        <>
+                            <div className="col-md-6 d-flex align-items-center">
+                                <input className="form-control mb-2" 
+                                style={{border:"1px solid #d3d3d3", borderRadius: '5px', height:"35px"}}
+                                value={module.name} 
+                                onChange={(e) => 
+                                    dispatch(setModule({ ...module, name: e.target.value }))
+                                } 
+                                />
+                                <button className="btn btn-primary mb-2 ms-2" onClick={handleUpdateModule} style={{height:"30px", width:"80px", borderRadius: '5px'}}>
+                                    Update
+                                </button>
+                                <button className="btn btn-success float-end mb-2 ms-2" onClick={handleAddModule} style={{height:"30px", width:"50px", borderRadius: '5px'}}>
+                                        Add
+                                </button>
+                            </div>
 
                         <div className="row-2">
                             <textarea className="form-control mb-2" 
@@ -172,6 +149,8 @@ function ModuleList() {
                             }
                             />
                         </div>
+                        </>
+                )}
                         
                     </div>
                 {/* </li>     */}
