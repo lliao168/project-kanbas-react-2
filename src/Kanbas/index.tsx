@@ -9,7 +9,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import store from "./store";
 import { Provider } from "react-redux";
+import * as clientUser from "../Users/client"
 const API_BASE = process.env.REACT_APP_API_BASE;
+
 
 function Kanbas() {
     const [courses, setCourses] = useState<any[]>([]);
@@ -54,6 +56,25 @@ function Kanbas() {
         );
     };
 
+    const [profile, setProfile] = useState(null);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const account = await clientUser.profile();
+                const formattedDob = account.dob ? new Date(account.dob).toISOString().split('T')[0] : '';
+                const updatedAccount = { ...account, dob: formattedDob };
+                setProfile(updatedAccount);
+                
+            } catch (error) {
+                console.error("Failed to fetch profile:", error);
+                
+            }
+        };
+        fetchProfile();
+    }, [profile]);
+
+
     return (
     <Provider store={store}>
         <div className="d-flex">
@@ -67,14 +88,7 @@ function Kanbas() {
                 <Routes>
                     <Route path="/" element={<Navigate to="Dashboard" />} />
                     <Route path="/Account/*" element={<Account />} />
-                    <Route path="Dashboard" element={<Dashboard 
-                    // courses={courses}
-                    // course={course}
-                    // setCourse={setCourse}
-                    // addNewCourse={addNewCourse}
-                    // deleteCourse={deleteCourse}
-                    // updateCourse={updateCourse}
-                    />} />
+                    <Route path="Dashboard" element={<Dashboard profile={profile}/>} />
                     {/* <Route path="Courses" element={<Courses />} /> */}
                     <Route path="Courses/:courseId/*" element={<Courses/>}/>
                 </Routes>

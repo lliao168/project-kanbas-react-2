@@ -7,7 +7,8 @@ import { courses } from "../Database";
 import { FaEllipsisVertical, FaFilePen } from "react-icons/fa6";
 import "./index.css";
 
-function Dashboard() {
+
+function Dashboard({profile} : any) {
   interface Course {
     _id: string;
     name: string;
@@ -70,87 +71,44 @@ function Dashboard() {
   };
 
 
-  // const fetchAllCourses = async () => { 
-  //     const courses = await client.fetchAllCourses();
-  //     setCourses(courses);
-  // };
-  // const createCourse = async () => {
-  //     const newCourse = await client.createCourse(course);
-  //     fetchAllCourses();
-  //     setCourses([newCourse, ...courses]);
-  // }
-  // const deleteCourse = async (id: string) => {
-  //     await client.deleteCourse(id);
-  //     fetchAllCourses();
-  // }
-  // const updateCourse = async (id: string) => {
-  //     if (course && course._id) {
-  //         await client.updateCourse(course, course._id);
-  //         fetchAllCourses(); 
-  //     }
-  // }
-
-
   useEffect(() => {
     fetchAllCourses();
   }, []);
-  // const [db_courses, setCourses] = useState(courses);
-  // const [course, setCourse] = useState( {
-  //     _id: "0", name: "New Course", number: "New Number",
-  //     startDate: "2023-09-10", endDate: "2023-12-15",
-  //     image: "/images/reactjs.jpg", courseNumber: "CS5610.35159.202430", term: "202430_2 Spring 2024 Semester Full Term",
-  //     termCode: "Spring 2 2024"
-  //   });
-  // const updateCourse = () => {
-  //     setCourses(
-  //       courses.map((c) => {
-  //         if (c._id === course._id) {
-  //           return course;
-  //         } else {
-  //           return c;
-  //         }
-  //       })
-  //     );
-  // };
-
-  // const addNewCourse = () => {
-  //     const newCourse = { ...course,
-  //                         _id: new Date().getTime().toString() };
-  //     setCourses([...db_courses, { ...course, ...newCourse }]);
-  // };
-  // const deleteCourse = (courseId: string) => {
-  //     setCourses(courses.filter((course) => course._id !== courseId));
-  // };
 
 
 
   return (
     <div className="p-4">
       <h1>Dashboard</h1>
-      <h5>Course</h5>
-      <input value={course.name} className="form-control"
-        onChange={(e) => setCourse({ ...course, name: e.target.value })} />
-      <input value={course.number} className="form-control mt-2"
-        onChange={(e) => setCourse({ ...course, number: e.target.value })} />
-      <input value={course.startDate} className="form-control mt-2" type="date"
-        onChange={(e) => setCourse({ ...course, startDate: e.target.value })} />
-      <input value={course.endDate} className="form-control mt-2" type="date"
-        onChange={(e) => setCourse({ ...course, endDate: e.target.value })} />
-      <input value={course.courseNumber} className="form-control mt-2" type="form-control"
-        onChange={(e) => setCourse({ ...course, courseNumber: e.target.value })} />
-      <input value={course.term} className="form-control mt-2" type="form-control"
-        onChange={(e) => setCourse({ ...course, term: e.target.value })} />
-      <input value={course.termCode} className="form-control mt-2" type="form-control"
-        onChange={(e) => setCourse({ ...course, termCode: e.target.value })} />
-      <button className="btn btn-success me-2 mt-2" onClick={createCourse} >
-        Add
-      </button>
-      <button className="btn btn-primary mt-2" onClick={(event) => {
-        event.preventDefault();
-        updateCourse();
-      }}>
-        Update
-      </button>
+      <button onClick={() => console.log(profile)}>Click Me</button>
+      {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+        <>
+         <h5>Course</h5>
+          <input value={course.name} className="form-control"
+            onChange={(e) => setCourse({ ...course, name: e.target.value })} />
+          <input value={course.number} className="form-control mt-2"
+            onChange={(e) => setCourse({ ...course, number: e.target.value })} />
+          <input value={course.startDate} className="form-control mt-2" type="date"
+            onChange={(e) => setCourse({ ...course, startDate: e.target.value })} />
+          <input value={course.endDate} className="form-control mt-2" type="date"
+            onChange={(e) => setCourse({ ...course, endDate: e.target.value })} />
+          <input value={course.courseNumber} className="form-control mt-2" type="form-control"
+            onChange={(e) => setCourse({ ...course, courseNumber: e.target.value })} />
+          <input value={course.term} className="form-control mt-2" type="form-control"
+            onChange={(e) => setCourse({ ...course, term: e.target.value })} />
+          <input value={course.termCode} className="form-control mt-2" type="form-control"
+            onChange={(e) => setCourse({ ...course, termCode: e.target.value })} />
+          <button className="btn btn-success me-2 mt-2" onClick={createCourse} >
+            Add
+          </button>
+          <button className="btn btn-primary mt-2" onClick={(event) => {
+            event.preventDefault();
+            updateCourse();
+          }}>
+            Update
+          </button>
+          </>
+      )}
 
 
       <hr />
@@ -174,20 +132,23 @@ function Dashboard() {
 
                 <p className="card-text mb-0" style={{ color: "grey", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }}>{course.courseNumber}</p>
                 <p className="card-text" style={{ fontSize: '12px', color: "grey", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }}>{course.term}</p>
-                {/* <Link to={`/Kanbas/Courses/${course._id}/Home`}> <FaFilePen style={{ color: "grey"}}/></Link> */}
-                <button style={{ backgroundColor: "white", border: "none" }} onClick={(event) => {
-                  event.preventDefault();
-                  setCourse(course);
-                }}>
-                  <FaFilePen style={{ color: "grey" }} />
-                </button>
+                {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                  <button style={{ backgroundColor: "white", border: "none" }} onClick={(event) => {
+                    event.preventDefault();
+                    setCourse(course);
+                  }}>
+                    <FaFilePen style={{ color: "grey" }} />
+                  </button>
+                )}
 
-                <button className="float-end btn btn-danger" onClick={() => {
-                  // event.preventDefault();
-                  deleteCourse(course);
-                }}>
-                  Delete
-                </button>
+                {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                  <button className="float-end btn btn-danger" onClick={() => {
+                    // event.preventDefault();
+                    deleteCourse(course);
+                  }}>
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           </div>))}

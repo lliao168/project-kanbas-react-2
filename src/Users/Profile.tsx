@@ -2,10 +2,14 @@ import * as client from "./client";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+// import { resetState } from './store/actions';
+
 export default function Profile() {
   const [profile, setProfile] = useState({ username: "", password: "", 
     firstName: "", lastName: "", dob: "", email: "", role: "USER" });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const fetchProfile = async () => {
     const account = await client.profile();
     const formattedDob = account.dob ? new Date(account.dob).toISOString().split('T')[0] : '';
@@ -14,6 +18,8 @@ export default function Profile() {
   };
   const signout = async () => {
     await client.signout();
+    localStorage.clear(); 
+    sessionStorage.clear();
     navigate("/Kanbas/Account/Signin");
   };
   useEffect(() => {
