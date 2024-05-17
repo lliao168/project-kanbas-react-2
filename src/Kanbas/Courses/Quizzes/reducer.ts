@@ -11,16 +11,43 @@ interface Quiz {
   pts: Number;
   Questions: Number;
   isPublished: Boolean;
-  shuffleAnswer: Boolean;
+  shuffleAnswers: Boolean;
   QuizType: string; 
   Minutes: Number;
   AccessCode: Number;
-
+  timeLimitCheck: Boolean;
+  multipleAttempts: Boolean;
+  showCorrectAnswersCheck: Boolean;
+  showCorrectAnswers: Date;
+  OneQuestionAtATime: Boolean;
+  WebCam: Boolean;
+  lockQuestionAfterAnswering: Boolean;
+  category: String;
 }
 
 const initialState = {
   quizzes: [] as Quiz[],
-  quiz: { title: "New Quiz", description: "New Quiz Description", points: 100, dueDate: '', availableFromDate: '', availableUntilDate: '', pts: 0, Questions: 0, isPublished: false, shuffleAnswer: true, QuizType: "Graded Quiz", Minutes: 20, AccessCode: "123"},
+  quiz: { title: "New Quiz", 
+  description: "New Quiz Description", 
+  points: 100, 
+  dueDate: '', 
+  availableFromDate: '', 
+  availableUntilDate: '', 
+  pts: '', 
+  Questions: 0, 
+  isPublished: false, 
+  shuffleAnswers: true, 
+  QuizType: "Graded Quiz", 
+  Minutes: 20, 
+  AccessCode: "123",
+  timeLimitCheck: true,
+  multipleAttempts: false,
+  showCorrectAnswersCheck: false,
+  showCorrectAnswers: '',
+  OneQuestionAtATime: true,
+  WebCam: false,
+  lockQuestionAfterAnswering: false,
+  category: "QUIZZES,"},
 };
 
 const quizzesSlice = createSlice({

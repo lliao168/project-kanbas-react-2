@@ -10,7 +10,7 @@ import { KanbasState } from '../../store';
 import { Modal, Button} from 'react-bootstrap';
 import { RxRocket } from "react-icons/rx";
 import { RiProhibitedLine } from "react-icons/ri";
-
+import {deleteAllQuestions} from "../Quizzes/Editor/QuestionsEditor/client";
 import {
     addAssignment,
     deleteAssignment,
@@ -63,7 +63,7 @@ function formatDate(dateString : any) {
     return formatter.format(date);
 }
 
-function Quizzes () {
+function Quizzes ({profile} : any) {
     const { courseId } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -87,10 +87,18 @@ function Quizzes () {
         availableUntilDate: Date;
         pts: Number;
         Questions: Number;
-        shuffleAnswer: Boolean;
+        shuffleAnswers: Boolean;
         QuizType: String;
         Minutes: Number;
         AccessCode: Number;
+        timeLimitCheck: Boolean;
+        multipleAttempts: Boolean;
+        showCorrectAnswersCheck: Boolean;
+        showCorrectAnswers: Date;
+        OneQuestionAtATime: Boolean;
+        WebCam: Boolean;
+        lockQuestionAfterAnswering: Boolean;
+        category: String;
     }
 
     const createDefaultQuiz = () => {
@@ -99,17 +107,25 @@ function Quizzes () {
             title: "New Quiz " + new Date(),
             course: courseId,  
             description: "New Quiz Description",
-            points: 0,
+            points: '',
             dueDate: new Date(),
             availableFromDate: new Date(),
             availableUntilDate: new Date(),
             isPublished: false,
-            pts: 0,
-            Questions: 0,
-            shuffleAnswer: false,
+            pts: '',
+            Questions: '',
+            shuffleAnswers: true,
             QuizType: "Graded Quiz",
-            Minutes: 0,
-            AccessCode: ''
+            Minutes: 20,
+            AccessCode: '',
+            timeLimitCheck: true,
+            multipleAttempts: false,
+            showCorrectAnswersCheck: false,
+            showCorrectAnswers: '',
+            OneQuestionAtATime: true,
+            WebCam: false,
+            lockQuestionAfterAnswering: false,
+            category: "QUIZZES",
         };
     };
 
@@ -118,12 +134,17 @@ function Quizzes () {
             console.error("Course ID is undefined.");
             return;
         }
-        e.preventDefault(); 
+        e.preventDefault();
         const newQuiz = createDefaultQuiz();
-        const createdQuiz = await client.createQuiz(courseId, newQuiz);
-        dispatch(addQuiz(createQuiz));
-        dispatch(selectQuiz(createdQuiz));
-        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${createdQuiz._id}`);
+        try {
+            const createdQuiz = await client.createQuiz(courseId, newQuiz);
+            dispatch(addQuiz(createdQuiz));
+            dispatch(selectQuiz(createdQuiz));
+            navigate(`/Kanbas/Courses/${courseId}/Quizzes/${createdQuiz._id}`);
+        } catch (e) {
+            console.log("error creating quiz: ", e);
+        }
+        
         
     };
     
@@ -188,19 +209,23 @@ function Quizzes () {
         } 
     };
 
-    const handleCloseDeleteModal = (e?: any) => {   // e is optional and if provided can be of any type
+    const handleCloseDeleteModal = (e?: any) => {
         if (e) e.stopPropagation();
         setSelectedQuizId(null);
         setShowDeleteModal(false);
+        setContextMenu({...contextMenu, visible: false});
     };
 
-    const handleDeleteQuiz = () => {
-        // e.stopPropagation();
+    const handleDeleteQuiz = async () => {
         if (selectedQuizId) {
-            client.deleteQuiz(selectedQuizId._id).then((status) => {
+            try {
+                await deleteAllQuestions(selectedQuizId._id);
+                await client.deleteQuiz(selectedQuizId._id);
                 dispatch(deleteQuiz(selectedQuizId._id));
-            });
-            handleCloseDeleteModal();
+                handleCloseDeleteModal();
+            } catch (error) {
+                console.error("Error deleting quiz and associated questions:", error);
+            }
         }
     };
 
@@ -306,14 +331,17 @@ function Quizzes () {
                                   
                                   <input type="text" className="form-control w-25" id="points" placeholder="Search for Quiz"/>
                                 </div>
-                                  <button type="button" className="btn btn-danger float end m-1"
-                                  onClick={handleCreateQuiz}>
-                                    + Quiz
-                                  </button>
-                                  <button type="button" className="btn btn-light float-end">
-                                    <FaEllipsisV/>
-                                  </button>
-                                  
+                                {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                                    <>
+                                    <button type="button" className="btn btn-danger float end m-1"
+                                    onClick={handleCreateQuiz}>
+                                        + Quiz
+                                    </button>
+                                    <button type="button" className="btn btn-light float-end">
+                                        <FaEllipsisV/>
+                                    </button>
+                                    </>
+                                )}
                               </li>
                         
             </div>
@@ -326,40 +354,65 @@ function Quizzes () {
                         <span style={{fontWeight:"bold"}}>Assignment Quizzes</span>
                     
                     </div>
-                    <ul className="list-group">
-                        {quizList
-                        .filter((quiz) => quiz.course === courseId)
-                        .map((quiz, index) => (
-                        <li key={index} className="list-group-item">
-                            <PiDotsSixVerticalBold style={{fontSize:"1.3em"}}/> 
-                            <RxRocket className="ms-3" style={{color:"green"}}/>                           
-                            <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} style={{textDecoration:"none", color:"black", fontWeight:"bold"}} className="ms-3" >{quiz.title}</Link>
-                            <div className="ms-3 mb-2" style={{flexWrap:"wrap", overflowWrap:"break-word"}}>    
-                                <Link to="#" className="" style={{textDecoration: "none", color:"grey", fontSize:"0.8em", marginLeft:"55px"}}>{determineQuizAvailability(quiz.availableFromDate, quiz.availableUntilDate)}  </Link> 
-                                <span style={{color:"grey", fontSize:"0.8em"}}>| Due {formatDate(quiz.dueDate)}  </span>
-                                {quiz.isPublished && (
-                                    <>
-                                        <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.pts} pts  </span>
-                                        <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.Questions} Questions  </span>
-                                    </>
-                                )}
-                                <span className="float-end">
-                                    {quiz.isPublished ? (
-                                        <FaCheckCircle className="text-success me-3" onClick={() => handlePublish(quiz._id)}/>
-                                    ) : (
-                                        <RiProhibitedLine className="text-muted me-3" onClick={() => handlePublish(quiz._id)} />
+                    {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
+                        <ul className="list-group">
+                            {quizList
+                            .filter((quiz) => quiz.course === courseId)
+                            .map((quiz, index) => (
+                            <li key={index} className="list-group-item">
+                                <PiDotsSixVerticalBold style={{fontSize:"1.3em"}}/> 
+                                <RxRocket className="ms-3" style={{color:"green"}}/>                           
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} style={{textDecoration:"none", color:"black", fontWeight:"bold"}} className="ms-3" >{quiz.title}</Link>
+                                <div className="ms-3 mb-2" style={{flexWrap:"wrap", overflowWrap:"break-word"}}>    
+                                    <Link to="#" className="" style={{textDecoration: "none", color:"grey", fontSize:"0.8em", marginLeft:"55px"}}>{determineQuizAvailability(quiz.availableFromDate, quiz.availableUntilDate)}  </Link> 
+                                    <span style={{color:"grey", fontSize:"0.8em"}}>| Due {formatDate(quiz.dueDate)}  </span>
+                                    {quiz.isPublished && (
+                                        <>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.pts} pts  </span>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.Questions} Questions  </span>
+                                        </>
                                     )}
-                                    <button onClick={(e) => handleContextMenu(e, quiz._id)} style={{backgroundColor:"white"}}>
-                                        <FaEllipsisV className="me-4"/>
-                                    </button>  
-                                    {renderContextMenu()}  
-                                </span>
-                            </div>    
-                            
-                        </li>))}
-                    </ul>
-                </li>
+                                    <span className="float-end">
+                                            {quiz.isPublished ? (
+                                                <FaCheckCircle className="text-success me-3" onClick={() => handlePublish(quiz._id)}/>
+                                            ) : (
+                                                <RiProhibitedLine className="text-muted me-3" onClick={() => handlePublish(quiz._id)} />
+                                            )}
+                                            <button onClick={(e) => handleContextMenu(e, quiz._id)} style={{backgroundColor:"white"}}>
+                                                <FaEllipsisV className="me-4"/>
+                                            </button>  
+                                            {renderContextMenu()}  
+                                    </span>
+                                </div>    
+                            </li>
+                            ))}
+                        </ul>
+                    )}
 
+                    {profile && (profile.role === "STUDENT" || profile.role === "USER") && (
+                        <ul className="list-group">
+                            {quizList
+                            .filter((quiz) => quiz.course === courseId)
+                            .map((quiz, index) => (
+                            <li key={index} className="list-group-item">
+                                <PiDotsSixVerticalBold style={{fontSize:"1.3em"}}/> 
+                                <RxRocket className="ms-3" style={{color:"green"}}/>                       
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}/Preview`} style={{textDecoration:"none", color:"black", fontWeight:"bold"}} className="ms-3" >{quiz.title}</Link>
+                                <div className="ms-3 mb-2" style={{flexWrap:"wrap", overflowWrap:"break-word"}}>    
+                                    <Link to="#" className="" style={{textDecoration: "none", color:"grey", fontSize:"0.8em", marginLeft:"55px"}}>{determineQuizAvailability(quiz.availableFromDate, quiz.availableUntilDate)}  </Link> 
+                                    <span style={{color:"grey", fontSize:"0.8em"}}>| Due {formatDate(quiz.dueDate)}  </span>
+                                    {quiz.isPublished && (
+                                        <>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.pts} pts  </span>
+                                            <span style={{color:"grey", fontSize:"0.8em"}}>| {quiz.Questions} Questions  </span>
+                                        </>
+                                    )}
+                                </div>    
+                            </li>
+                            ))}
+                        </ul>
+                    )}  
+                </li>
             </ul>
         </div>
         </>

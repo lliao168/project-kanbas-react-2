@@ -1,7 +1,7 @@
 // import { useParams } from "react-router";
 import { courses } from "../../Kanbas/Database";
 import { Link, Navigate, Route, Routes, useParams, useLocation, useNavigate } from "react-router-dom";
-import { HiMiniBars3 } from "react-icons/hi2";
+// import { HiMiniBars3 } from "react-icons/hi2";
 import CourseNavigation from "./Navigation";
 import Modules from "./Modules";
 import { FaGlasses } from "react-icons/fa6";
@@ -37,13 +37,14 @@ import QuizDetailsScreen from "./Quizzes/Details";
 import QuizDetailsEditor from "./Quizzes/Editor/DetailsEditor";
 import QuizEditor from "./Quizzes/Editor";
 import QuizQuestionsDetailEditor from "./Quizzes/Editor/QuestionsEditor";
+import { LiaBarsSolid } from "react-icons/lia";
 
 import * as client from "./client";
 import { Course } from "./client";
 import QuizPreview from "./Quizzes/Preview";
 const API_BASE = process.env.REACT_APP_API_BASE;
 
-function Courses() {
+function Courses({profile} : any) {
         const { courseId } = useParams();
         const COURSES_API = `${API_BASE}/api/courses`;
         const [courses, setCourses] = useState<Course[]>([]);
@@ -117,7 +118,7 @@ function Courses() {
                         <li className="d-flex justify-content-end align-items-center" style={{ marginLeft: "20px"}}>
                                     <div className="col-auto">
                                         <button className="btn btn-primary border border-white" type="button" data-bs-toggle="collapse" data-bs-target="#collpaseKanbasNavigation" aria-expanded="false" aria-controls="collpaseKanbasNavigation" style={{backgroundColor: "white"}}>
-                                            <HiMiniBars3 style={{color:"crimson", fontWeight:"normal"}}/>
+                                            <LiaBarsSolid style={{color:"crimson", fontWeight:"normal"}}/>
                                         </button>
                                     </div>    
 
@@ -249,7 +250,7 @@ function Courses() {
                     <li className="list-group-item d-flex justify-content-start align-items-center" style={{backgroundColor:"black"}}>
                         <div className="col float-start">
                             <button className="btn btn-primary border border-black me-3" type="button" data-bs-toggle="collapse" data-bs-target="#collpaseKanbasNavigation" aria-expanded="false" aria-controls="collpaseKanbasNavigation" style={{backgroundColor: "black"}}>
-                                <HiMiniBars3 style={{color:"white"}}/>
+                                <LiaBarsSolid style={{color:"white"}}/>
                             </button>
                         </div>   
                         <div className="d-flex align-items-center flex-grow-1 p-2 ms-5"> 
@@ -444,14 +445,14 @@ function Courses() {
                             <Route path="Modules" element={<Modules/>} />
                             <Route path="Piazza" element={<h1>Piazza</h1>} />
                             <Route path="Zoom Meetings" element={<h1>Zoom Meetings</h1>} />
-                            <Route path="Assignments" element={<Assignments/>} />
+                            <Route path="Assignments" element={<Assignments profile={profile}/>} />
                             <Route path="Assignments/:assignmentId" element={<AssignmentEditor/>}/>
-                            <Route path="Quizzes" element={<Quizzes/>} />
+                            <Route path="Quizzes" element={<Quizzes profile={profile}/>} />
                             <Route path="Quizzes/:quizId" element={<QuizDetailsScreen/>}/>
                             <Route path="Quizzes/:quizId/Editor" element={<QuizEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/DetailsEditor" element={<QuizDetailsEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/QuestionsEditor" element={<QuizQuestionsDetailEditor/>}/>
-                            <Route path="Quizzes/:quizId/Preview" element={<QuizPreview/>}/>
+                            <Route path="Quizzes/:quizId/Preview" element={<QuizPreview profile={profile}/>}/>
                             <Route path="Grades" element={<Grades />} />
                             <Route path="People" element={<h1>People</h1>} />
                             <Route path="Panopto Video" element={<h1>Panopto Video</h1>} />

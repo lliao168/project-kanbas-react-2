@@ -13,252 +13,394 @@ import { FaXmark } from "react-icons/fa6";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CiSearch } from "react-icons/ci";
-
-import {
-    addAssignment,
-    deleteAssignment,
-    updateAssignment,
-    selectAssignment,
-  } from "../../../../Courses/Assignments/assignmentsReducer";
-
-// import * as client from "../../../../Courses/Assignments/client";  
-import { findAssignmentsForCourse, createAssignment } from "../../../../Courses/Assignments/client";
 import QuizMultipleChoiceEditor from './MultipleChoice';
 import QuizTrueFalseEditor from './TrueFalse';
 import QuizFillBlankEditor from './FillBlank';
+import * as client from "./client"; 
+import { Question, Blank, TrueFalse, Choice } from './client';
+import * as clientQuiz from "../../client";  
+import { addQuiz, updateQuiz } from '../../reducer';
 
-import {
-    addQuiz,
-    deleteQuiz,
-    updateQuiz,
-    selectQuiz,
-    setQuizzes,
-} from "../../reducer"
-
-import * as client from "../../client";  
-import { findQuizzesForCourse, createQuiz } from "../../client";
-
-
-interface Question {
-    id: number;
-    type: string;
-}
 
 function QuizQuestionsDetailEditor() {
-    const { assignmentId, courseId, quizId } = useParams();
+    const {courseId, quizId} = useParams();
+    const [questions, setQuestions] = useState<Question[]>([]);
+    const [originalQuestions, setOriginalQuestions] = useState<Question[]>([]);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        findQuizzesForCourse(courseId)
-          .then((quizzes) =>
-            dispatch(selectQuiz(quizzes))
-        );
-      }, [courseId]);   
+    const [question, setQuestion] = useState<Question>({
+        _id: "", title: "New Question", quizId: '', question: 'The Question Description', points: 0, questionType: "Multiple Choice"});
     const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
-    // const assignment = useSelector((state: KanbasState) => state.assignmentsReducer.assignment);
     const quiz = quizList.find(
         (quiz) => quiz.course === courseId && quiz._id === quizId 
     );
-    interface Assignment {
-        _id: string;
-        title: string;
-        course: string;
-        category: string;
-        description: string;
-        isPublished: boolean;
-    }
 
-    interface Quiz {
-        _id: string;
-        title: string;
-        course: string;
-        description: string;
-        isPublished: boolean;
-        points: Number;
-        dueDate: Date;
-        availableFromDate: Date;
-        availableUntilDate: Date;
-        pts: Number;
-        Questions: Number;
-        shuffleAnswer: Boolean;
-        QuizType: String;
-        Minutes: Number;
-        AccessCode: Number;
-    }
-
-    const [quizInstructions, setQuizInstructions] = useState('');
-
-    const handleInstructionsChange = (value : any) => {
-        setQuizInstructions(value);
-        dispatch(updateQuiz({...quiz, description: value}));
-    };
-
-    const handleAddQuiz = () => {
-        const newQuizDetails = {
-            ...quiz,
-            course: courseId,
+    useEffect(() => {
+        const fetchQuestions = async () => {
+            try {
+                const questionsData = await client.findQuestionsForQuiz(quizId);
+                setQuestions(questionsData);
+                setOriginalQuestions(questionsData);
+            } catch (error) {
+                console.error("Error fetching questions:", error);
+            }
         };
-        if(courseId) {
-            client.createQuiz(courseId, newQuizDetails).then((newQuizDetails) => {
-                dispatch(addQuiz(newQuizDetails));
-            });
-        }
-      };
-
-    const handleUpdateQuiz = async () => {
-        const status = await client.updateQuiz(quiz);
-        dispatch(updateQuiz(quiz));
-    };
-
-    const handleSave = () => {
-        // if (!assignment.dueDate || !assignment.availableFromDate || !assignment.availableUntilDate) {
-        //     alert("All date fields ('Due to', 'Available from', and 'Until') are required to save this assignment.");
-        //     return;
-        // }
-        if (quizId && quizId !== 'new') {
-            handleUpdateQuiz(); 
-        } else {
-            // const newAssignmentDetails = {
-            //     ...assignment,
-            //     course: courseId,
-            //     category: assignment.category
-            // };
-            // dispatch(addAssignment(newAssignmentDetails));
-            handleAddQuiz();
-        }
-        navigate(`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`);
-    };
+        fetchQuestions();
+    }, [quizId]);
     
+    if (!questions) {
+        return <div>Loading...</div>;
+    }
 
-    const [title, setTitle] = useState('');
-    const handleTitleChange = (e : any) => setTitle(e.target.value);
-
-    const [points, setPoints] = useState(1);
-    const handlePointsChange = (e : any) => setPoints(Number(e.target.value) || 0);
-
-    const [showQuestionForm, setShowQuestionForm] = useState(false);
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [questionType, setQuestionType] = useState('multipleChoice');
-    const [currentQuestionId, setCurrentQuestionId] = useState<number | null>(null);
-
-    const handleQuestionTypeChange = (event : any) => {
-        setQuestionType(event.target.value);
+    const handleQuestionUpdate = (updatedQuestion: Question) => {
+        const updatedQuestions = questions.map((q) =>
+            q._id === updatedQuestion._id ? updatedQuestion : q
+        );
+        setQuestions(updatedQuestions);
     };
 
-    const handleAddQuestionClick = () => {
-        const newId = Date.now();
-        // const newId = questions.length > 0 ? Math.max(...questions.map(q => q.id)) + 1 : 1;
-        setQuestions([
-            ...questions,
-            {id: newId, type: 'multipleChoice'}
-        ]);
-        setCurrentQuestionId(newId);
-        setShowQuestionForm(true); 
+    const handleUpdateClick = async () => {
+        try {
+            await Promise.all(questions.map((question) => client.updateQuestion(question)));
+            console.log("Questions updated successfully and ready for preview");
+        } catch (error) {
+            console.error("Error updating questions:", error);
+        }
     };
-
     const handleCancel = () => {
-        setShowQuestionForm(false);
-        if (questions.length === 1 && questions[0].id === currentQuestionId) {
-            setQuestions([]);  
-        } else {
-            setQuestions(questions.filter(question => question.id !== currentQuestionId));
-            setCurrentQuestionId(null);
-        }
+        
+        // setQuestions(originalQuestions);
+        
     };
-    
 
+    const handleCreateQuestion = async () => {
+        try {
+            const newQuestion = await client.createQuestion(quizId, question);
+            setQuestions([ ...questions, newQuestion]);
+        } catch (err) {
+            console.log("failed to create question", err);
+        }
+    }
+
+    const handleSaveAndPublish = () => {
+        if (!quiz) {
+            console.error('Quiz details are undefined');
+            return; 
+        }
+    
+        const updatedQuiz = {
+            ...quiz,
+            isPublished: quiz.isPublished ? quiz.isPublished : true
+        };
+       
+        clientQuiz.updateQuiz(updatedQuiz).then(() => { 
+        dispatch(updateQuiz(updatedQuiz)); })
+        navigate(`/Kanbas/Courses/${courseId}/Quizzes/`)
+    }
+    
     return(
         <div>
-                
-                    {questions.length > 0 && questions.map((question, index) => {
+            {questions.map((question: any) => {
                         return (
-                            <div className="row g-3 mt-2" style={{marginLeft:"20px", marginRight:"20px"}}>
-                                    <div className="col-md-6" style={{width:"200px"}} key={question.id}>
-                                        <input 
-                                        value="Question Title"
-                                        onChange={handleTitleChange}
+                            <div key={question._id} className="row g-3 mt-2" style={{marginLeft:"20px", marginRight:"20px"}}>
+                                {question && (
+                                    <div className="col-md-6" style={{width:"200px"}} >
+                                        <input
+                                        value= {question.title}
+                                        onChange={(e) => handleQuestionUpdate({...question, title: e.target.value})}
                                         className="form-control mb-2" />
                                     </div>
+                                )}
+                                {question && (
                                     <div className="col-md-6" style={{width:"300px"}}>
                                         <select
                                             id="questionTypeSelect"
                                             className="form-select"
-                                            value={questionType}
-                                            onChange={handleQuestionTypeChange}
+                                            value={question.questionType}
+                                            onChange={(e) => handleQuestionUpdate({...question, questionType: e.target.value})}
                                         >
-                                            <option value="multipleChoice">Multiple Choice</option>
-                                            <option value="trueFalse">True/False</option>
-                                            <option value="fillInBlank">Fill In the Blank</option>
-                                        </select>   
+                                            <option value="Multiple Choice">Multiple Choice</option>
+                                            <option value="True/False">True/False</option>
+                                            <option value="Fill In the Blank">Fill In the Blank</option>
+                                        </select>  
                                     </div>  
-                                    {questionType === 'multipleChoice' && (
-                                            <QuizMultipleChoiceEditor onCancel={handleCancel}/>
-                                        )}
-                                        {questionType === 'trueFalse' && (
-                                            <QuizTrueFalseEditor onCancel={handleCancel}/>
-                                        )}
-                                        {questionType === 'fillInBlank' && (
-                                            <QuizFillBlankEditor onCancel={handleCancel}/>
-                                        )}
+                                )}
+                           
+                                {question && (        
                                     <div className="col-md-6 text-align:left flex-fill" >
-                                        <input type="number" 
+                                        <input type="number"
                                             className="form-control float-end me-2"
-                                            style={{width:"70px"}} 
+                                            style={{width:"70px"}}
                                             id="pts"
-                                            value={points}
-                                            onChange={handlePointsChange}
+                                            value={question.points}
+                                            onChange={(e) => handleQuestionUpdate({...question, points: parseInt(e.target.value)})}
                                         />
                                         <label className="float-end mt-2 me-2">pts:</label>
-                                    </div>   
-                                
-                            </div>
-                        );
-                    })}
-                 
-
+                                    </div>  
+                                )}
+                                        {question.questionType === "Multiple Choice" && (
+                                            <QuizMultipleChoiceEditor key={question._id} 
+                                            question={question}
+                                            setQuestions={setQuestions}
+                                            onCancel={handleCancel}/>
+                                        )}
+                                        {question.questionType === 'True/False' && (
+                                            <QuizTrueFalseEditor key={question._id} 
+                                            question={question}
+                                            setQuestions={setQuestions}
+                                            onCancel={handleCancel}/>
+                                        )}
+                                        {question.questionType === 'Fill In the Blank' && (
+                                            <QuizFillBlankEditor key={question._id}
+                                            question={question}
+                                            setQuestions={setQuestions}
+                                            onCancel={handleCancel}/>
+                                           
+                                )}
+                               
+                            </div>  
+                        );  
+                        })}
                 <hr style={{color:"black", marginLeft:"20px", marginRight:"20px"}} />
-            
                 <div className="d-flex justify-content-center mt-2">
-                            <button className="btn btn-light ms-3" onClick={handleAddQuestionClick}>
-                            + New Question
-                            </button>
-                            <Link to={"#"} className="btn btn-light ms-4">
-                                + New Question Group
-                            </Link>
-                            <Link to={"#"}
-                                className="btn btn-light ms-4">
-                                <CiSearch className="me-2"/>Find Questions
-                            </Link>
-                </div> 
-
-                <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px"}} />
-
-                <div className="row g-3" style={{marginLeft:"20px", marginRight:"20px"}}>
-                    <div className="col-md-6 text-align:left">
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" id="gridCheck"/>
-                                            <label className="form-check-label" htmlFor="gridCheck">
-                                              Notify users that this quiz has changed
-                                            </label>
-                                        </div>
-                    </div>
-    
-                    <div className="col-md-6 text-align:left ">
-                        <button onClick={handleSave}  className="btn btn-danger ms-2 float-end">
-                        Save
-                        </button>
-                        <Link to={"#"} className="btn btn-light float-end ms-2">
-                            Save & Publish
+                    <button onClick ={handleCreateQuestion} className="btn btn-light ms-3">
+                        + New Question
+                    </button>
+                    <Link to={"#"} className="btn btn-light ms-4">
+                        + New Question Group
                         </Link>
-                        <Link to={`/Kanbas/Courses/${courseId}/Quizzes`}
-                            onClick={() => {navigate(`/Kanbas/Courses/${courseId}/Quizzes`)}} className="btn btn-light float-end">
-                            Cancel
-                        </Link>
-                    </div>    
-                </div>     
-                
-        </div>
-    );
+                                    <Link to={"#"}
+                                      className="btn btn-light ms-4">
+                                      <CiSearch className="me-2"/>Find Questions
+                                  </Link>
+                      </div>
+        
+                        <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px"}} />
+        
+                       <div className="row g-3" style={{marginLeft:"20px", marginRight:"20px"}}>
+                           <div className="col-md-6 text-align:left">
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="checkbox" id="gridCheck"/>
+                                                   <label className="form-check-label" htmlFor="gridCheck">
+                                                     Notify users that this quiz has changed
+                                                    </label>
+                                               </div>
+                          </div>
+          
+                            <div className="col-md-6 text-align:left ">
+                              { quiz &&  
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quiz._id}`} onClick={handleUpdateClick} className="btn btn-danger ms-2 float-end">
+                                Save
+                                </Link>
+                              }
+                                
+                                <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}/Preview`} className="btn btn-light float-end ms-2"
+                                onClick={() => {handleUpdateClick();  handleSaveAndPublish()}} 
+                                >
+                                   Save & Publish
+                              </Link>
+                               <Link to={`/Kanbas/Courses/${courseId}/Quizzes/${quizId}`}
+                                   className="btn btn-light float-end">
+                                   Cancel
+                               </Link>
+                           </div>    
+                       </div>    
+                      
+               </div> 
+    )
 }
 export default QuizQuestionsDetailEditor;
+ 
+ 
+    // const questionList = useSelector((state: KanbasState) => state.questionsReducer.questions);
+    // const question = questionList.find(
+    //     (question) => question.quiz === quizId && question._id === questionId
+    // );
+ 
+    // const [showQuestionForm, setShowQuestionForm] = useState(true);
+    // // const [questions, setQuestions] = useState<Question[]>([]);
+    // const [questionType, setQuestionType] = useState('Multiple Choice');
+    // const [currentQuestionId, setCurrentQuestionId] = useState<number | null>(null);
+    // const [questionTitle, setQuestionTitle] = useState('');
+    // const [points, setPoints] = useState(1);
+ 
+    // const handleTitleChange = (value : any, questionId : any) => {
+    //     const updatedQuestions = questionList.map(question => {
+    //         if (question._id === questionId) {
+    //             return {...question, title: value};
+    //         }
+    //         return question;
+    //     });
+    //     dispatch(setQuestions(updatedQuestions));
+    // };
+ 
+    // const handleQuestionChange = (value : any, questionId : any) => {
+    //     // setQuizQuestion(value);
+    //     // dispatch(updateAssignment({...assignment, description: value}));
+    //     const updatedQuestions = questionList.map(question => {
+    //         if (question._id === questionId) {
+    //             return {...question, question: value};
+    //         }
+    //         return question;
+    //     });
+    //     dispatch(setQuestions(updatedQuestions));
+    // };
+ 
+    // const handlePointsChange = (value : any, questionId : any) => {
+    //     const updatedQuestions = questionList.map(question => {
+    //         if (question._id === questionId) {
+    //             return {...question, points: value};
+    //         }
+    //         return question;
+    //     });
+    //     dispatch(setQuestions(updatedQuestions));
+    // };
+ 
+    // const handleQuestionTypeChange = (newType : any, questionId : any) => {
+    //     const updatedQuestions = questionList.map(question => {
+    //         if (question._id === questionId) {
+    //             return {...question, questionType: newType};
+    //         }
+    //         return question;
+    //     });
+    //     dispatch(setQuestions(updatedQuestions));
+    // };
+ 
+    // const createDefaultQuestion = () => {
+    //     return {
+    //         _id: new Date(),
+    //         title: "New Question Title",
+    //         quiz: quizId,  
+    //         question: "New Question",
+    //         points: 0,
+    //         questionType: "Multiple Choice",
+    //     };
+    // };
+ 
+    // const handleAddQuestionClick = async () => {
+    //     if (quizId) {
+    //         const newQuestion = createDefaultQuestion();
+    //         const createdQuestion = await client.createQuestion(quizId, newQuestion)
+    //         if (createdQuestion && createdQuestion._id) {
+    //             dispatch(addQuestion(createdQuestion))
+    //             dispatch(selectQuestion(createdQuestion));
+    //             setShowQuestionForm(true);
+    //         }
+    //     }
+    // };
+ 
+ 
+    // const handleSave = () => {
+       
+    // };
+ 
+    // const handleCancel = () => {
+    //     // setShowQuestionForm(false);
+    //     // if (questions.length === 1 && questions[0].id === currentQuestionId) {
+    //     //     setQuestions([]);  
+    //     // } else {
+    //     //     setQuestions(questions.filter(question => question.id !== currentQuestionId));
+    //     //     setCurrentQuestionId(null);
+    //     // }
+    // };
+   
+ 
+    // return(
+    //     <div>
+    //             {questionList.length > 0 && questionList.map((question, index) => {
+    //                     return (
+    //                         <div key={question._id} className="row g-3 mt-2" style={{marginLeft:"20px", marginRight:"20px"}}>
+    //                             {question && (
+    //                                 <div className="col-md-6" style={{width:"200px"}} >
+    //                                     <input
+    //                                     value= {question.title}
+    //                                     onChange={(e) => handleTitleChange(e.target.value, question._id)}
+    //                                     className="form-control mb-2" />
+    //                                 </div>
+    //                             )}
+    //                             {question && (
+    //                                 <div className="col-md-6" style={{width:"300px"}}>
+    //                                     <select
+    //                                         id="questionTypeSelect"
+    //                                         className="form-select"
+    //                                         value={question.questionType}
+    //                                         onChange={(event) => handleQuestionTypeChange(event.target.value, question._id)}
+    //                                     >
+    //                                         <option value="Multiple Choice">Multiple Choice</option>
+    //                                         <option value="True/False">True/False</option>
+    //                                         <option value="Fill In The Blank">Fill In the Blank</option>
+    //                                     </select>  
+    //                                 </div>  
+    //                             )}
+                           
+    //                             {question && (        
+    //                                 <div className="col-md-6 text-align:left flex-fill" >
+    //                                     <input type="number"
+    //                                         className="form-control float-end me-2"
+    //                                         style={{width:"70px"}}
+    //                                         id="pts"
+    //                                         value={question.points}
+    //                                         onChange={(e) => handlePointsChange(e.target.value, question._id)}
+    //                                     />
+    //                                     <label className="float-end mt-2 me-2">pts:</label>
+    //                                 </div>  
+    //                             )}
+    //                                     {question.questionType === "Multiple Choice" && (
+    //                                         <QuizMultipleChoiceEditor onCancel={handleCancel}/>
+    //                                     )}
+    //                                     {question.questionType === 'True/False' && (
+    //                                         <QuizTrueFalseEditor onCancel={handleCancel}/>
+    //                                     )}
+    //                                     {question.questionType === 'Fill In The Blank' && (
+    //                                         <QuizFillBlankEditor onCancel={handleCancel}/>
+                                           
+    //                             )}
+                               
+    //                         </div>  
+    //                     );  
+    //             })}      
+                 
+ 
+    //             <hr style={{color:"black", marginLeft:"20px", marginRight:"20px"}} />
+           
+    //             <div className="d-flex justify-content-center mt-2">
+    //                         <button className="btn btn-light ms-3" onClick={handleAddQuestionClick}>
+    //                         + New Question
+    //                         </button>
+    //                         <Link to={"#"} className="btn btn-light ms-4">
+    //                             + New Question Group
+    //                         </Link>
+    //                         <Link to={"#"}
+    //                             className="btn btn-light ms-4">
+    //                             <CiSearch className="me-2"/>Find Questions
+    //                         </Link>
+    //             </div>
+ 
+    //             <hr style={{color:"grey", marginLeft:"20px", marginRight:"20px"}} />
+ 
+    //             <div className="row g-3" style={{marginLeft:"20px", marginRight:"20px"}}>
+    //                 <div className="col-md-6 text-align:left">
+    //                                     <div className="form-check">
+    //                                         <input className="form-check-input" type="checkbox" id="gridCheck"/>
+    //                                         <label className="form-check-label" htmlFor="gridCheck">
+    //                                           Notify users that this quiz has changed
+    //                                         </label>
+    //                                     </div>
+    //                 </div>
+   
+    //                 <div className="col-md-6 text-align:left ">
+    //                     <button onClick={handleSave}  className="btn btn-danger ms-2 float-end">
+    //                     Save
+    //                     </button>
+    //                     <Link to={"#"} className="btn btn-light float-end ms-2">
+    //                         Save & Publish
+    //                     </Link>
+    //                     <Link to={"#"}
+    //                         onClick={() => {handleCancel()}} className="btn btn-light float-end">
+    //                         Cancel
+    //                     </Link>
+    //                 </div>    
+    //             </div>    
+               
+    //     </div>
+    // );

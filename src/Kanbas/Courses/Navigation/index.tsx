@@ -12,7 +12,7 @@ function CourseNavigation() {
     return (
         
         <ul className="wd-navigation">
-            {courseTerm.map((course) => (<span style={{color:"grey", fontSize:"12px", 
+            {courseTerm.map((course) => (<span key={course._id} style={{color:"grey", fontSize:"12px", 
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", marginLeft: "10px"}}>{course.term}</span>))}
             {links.map((link, index) => (
                 <li key={index} className={pathname.includes(link) ? "wd-active" : ""}>
