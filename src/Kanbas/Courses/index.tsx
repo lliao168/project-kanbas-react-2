@@ -38,6 +38,7 @@ import QuizDetailsEditor from "./Quizzes/Editor/DetailsEditor";
 import QuizEditor from "./Quizzes/Editor";
 import QuizQuestionsDetailEditor from "./Quizzes/Editor/QuestionsEditor";
 import { LiaBarsSolid } from "react-icons/lia";
+import Piazza from "./Piazza";
 
 import * as client from "./client";
 import { Course } from "./client";
@@ -108,8 +109,8 @@ function Courses({profile} : any) {
         "Discussions", "Announcements", "Pages", "Files", "Rubrics", "Outcomes", "Collaborations", "Syllabus", "Settings"];
         const { pathname } = useLocation();
         const navigate = useNavigate();
-        console.log("pathname:", pathname);
-        console.log("links array:", links);
+        // console.log("pathname:", pathname);
+        // console.log("links array:", links);
 
     return (
         <div>
@@ -378,7 +379,7 @@ function Courses({profile} : any) {
                                     <Link to="/Kanbas/Courses/Modules">
                                         <FaCircleNodes/>Modules</Link>
                                 </li>
-                                <li><Link to="#">
+                                <li><Link to="/kanbas/Courses/Piazza">
                                     <LuPlug2/>Piazza</Link>
                                 </li>
                                 <li><Link to="#">
@@ -441,14 +442,14 @@ function Courses({profile} : any) {
                         style={{ left: "260px", top: "60px" }} >
                         <Routes>
                             <Route path="/" element={<Navigate to="Home" />} />
-                            <Route path="Home" element={<Home/>} />
-                            <Route path="Modules" element={<Modules/>} />
-                            <Route path="Piazza" element={<h1>Piazza</h1>} />
+                            <Route path="Home" element={<Home profile={profile}/>} />
+                            <Route path="Modules" element={<Modules profile={profile}/>} />
+                            <Route path="Piazza" element={<Piazza/>} />
                             <Route path="Zoom Meetings" element={<h1>Zoom Meetings</h1>} />
                             <Route path="Assignments" element={<Assignments profile={profile}/>} />
                             <Route path="Assignments/:assignmentId" element={<AssignmentEditor/>}/>
                             <Route path="Quizzes" element={<Quizzes profile={profile}/>} />
-                            <Route path="Quizzes/:quizId" element={<QuizDetailsScreen/>}/>
+                            <Route path="Quizzes/:quizId" element={<QuizDetailsScreen profile={profile}/>}/>
                             <Route path="Quizzes/:quizId/Editor" element={<QuizEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/DetailsEditor" element={<QuizDetailsEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/QuestionsEditor" element={<QuizQuestionsDetailEditor/>}/>
