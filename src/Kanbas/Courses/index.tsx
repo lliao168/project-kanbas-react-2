@@ -39,6 +39,7 @@ import QuizEditor from "./Quizzes/Editor";
 import QuizQuestionsDetailEditor from "./Quizzes/Editor/QuestionsEditor";
 import { LiaBarsSolid } from "react-icons/lia";
 import Piazza from "./Piazza";
+import Grade from "./Grades";
 
 import * as client from "./client";
 import { Course } from "./client";
@@ -454,7 +455,7 @@ function Courses({profile} : any) {
                             <Route path="Quizzes/:quizId/Editor/DetailsEditor" element={<QuizDetailsEditor/>}/>
                             <Route path="Quizzes/:quizId/Editor/QuestionsEditor" element={<QuizQuestionsDetailEditor/>}/>
                             <Route path="Quizzes/:quizId/Preview" element={<QuizPreview profile={profile}/>}/>
-                            <Route path="Grades" element={<Grades />} />
+                            <Route path="Grades" element={<Grades profile={profile} />} />
                             <Route path="People" element={<h1>People</h1>} />
                             <Route path="Panopto Video" element={<h1>Panopto Video</h1>} />
                             <Route path="Discussions" element={<h1>Discussions</h1>} />

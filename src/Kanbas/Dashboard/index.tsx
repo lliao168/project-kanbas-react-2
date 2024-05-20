@@ -107,7 +107,7 @@ function Dashboard({profile} : any) {
           }}>
             Update
           </button>
-          </>
+        </>
       )}
 
 
