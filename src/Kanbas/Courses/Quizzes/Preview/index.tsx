@@ -220,7 +220,7 @@ function QuizPreview({profile} : any) {
                     <div style={{ width: "80%", marginLeft: "60px" }}>
                         {questions.filter((question: any) => question._id === currentQuestion._id).map((question: any, index: any) => (
                             <div key={question._id} className="d-grid gap-3 col-sm border border-1 p-4">
-                                <div style={{ fontSize: "1.2em", marginLeft: "30px" }}>{question.question}</div>
+                                <div style={{ fontSize: "1.2em", marginLeft: "30px" }}>{question.question.replace("<p>", " ").replace("</p>", " ")}</div>
                                 <hr style={{ color: "grey", marginLeft: "20px", marginRight: "20px", marginTop: "10px", marginBottom: "-5px" }} />
                                 {question.questionType === 'Multiple Choice' && (
                                     <ul className="list-group">
@@ -291,7 +291,7 @@ function QuizPreview({profile} : any) {
                             <h4>Results</h4>
                             {questions.map((question) => (
                                 <div key={question._id}>
-                                    <div>{question.question}</div>
+                                    <div>{question.question.replace("<p>", " ").replace("</p>", " ")}</div>
                                     <div>
                                         {results[question._id] ? (
                                             <span style={{ color: 'green' }}>Correct</span>
