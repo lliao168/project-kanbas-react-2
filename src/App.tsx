@@ -8,6 +8,7 @@ import {HashRouter} from "react-router-dom";
 import {Link} from "react-router-dom";
 import {Routes, Route, Navigate} from "react-router";
 import Signin from './Users/Signin';
+import Signup from './Users/Signup';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/Signin"/>}/>
           <Route path="/Signin" element={<Signin />} />
+          <Route path="/Signup" element={<Signup />} />
           <Route path="/Labs/*" element={<Labs/>}/>
           <Route path="/Kanbas/*" element={<Kanbas/>}/>
           <Route path="/hello" element={<HelloWorld />} />

@@ -80,7 +80,7 @@ function Dashboard({profile} : any) {
   return (
     <div className="p-4">
       <h1>Dashboard</h1>
-      <button onClick={() => console.log(profile)}>Click Me</button>
+      {/* <button onClick={() => console.log(profile)}>Click Me</button> */}
       {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
         <>
          <h5>Course</h5>

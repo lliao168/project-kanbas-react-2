@@ -88,7 +88,7 @@ function QuizDetailsScreen({ profile }: any) {
 
     return (
         <div>
-            <button onClick={() => console.log(profile)}>Click Me</button>
+            {/* <button onClick={() => console.log(profile)}>Click Me</button> */}
             {profile && (profile.role === "ADMIN" || profile.role === "FACULTY") && (
                 <>
                 
