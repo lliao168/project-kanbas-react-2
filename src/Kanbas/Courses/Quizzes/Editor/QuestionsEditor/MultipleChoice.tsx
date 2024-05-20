@@ -28,6 +28,11 @@ import { findAssignmentsForCourse, createAssignment } from "../../../../Courses/
 import React, { useState } from 'react';
 import * as client from "./client";
 
+function stripHtml(html: string) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+}
+
 function QuizMultipleChoiceEditor({ question, setQuestions, onCancel }: any) {
     const [quizQuestion, setQuizQuestion] = useState(question.question);
     const [choices, setChoices] = useState(question.multipleChoice || []);
