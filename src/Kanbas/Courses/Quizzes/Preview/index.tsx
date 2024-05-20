@@ -107,6 +107,14 @@ function QuizPreview({profile} : any) {
         }
     };
 
+    const handlePrevious = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(currentQuestionIndex - 1);
+        } else {
+            console.log('Already at the first question');
+        }
+    };
+
 
     const goToQuestion = (index: any) => {
         setCurrentQuestionIndex(index);
@@ -165,7 +173,6 @@ function QuizPreview({profile} : any) {
             <hr style={{ color: "black", marginLeft: "20px", marginRight: "20px" }} />
 
             <div className="p-4">
-
                 <div className="d-flex" style={{ marginLeft: "20px", marginRight: "20px" }}>
                     <div style={{ marginLeft: "30px", fontSize: "30px", marginTop: "20px" }}>
                         <CgPentagonRight />
@@ -186,7 +193,6 @@ function QuizPreview({profile} : any) {
                         {questions.filter((question: any) => question._id === currentQuestion._id).map((question: any, index: any) => (
                             <div key={question._id} className="d-grid gap-3 col-sm border border-1 p-4">
                                 <div style={{ fontSize: "1.2em", marginLeft: "30px" }}>{question.question}</div>
-
                                 <hr style={{ color: "grey", marginLeft: "20px", marginRight: "20px", marginTop: "10px", marginBottom: "-5px" }} />
                                 {question.questionType === 'Multiple Choice' && (
                                     <ul className="list-group">
@@ -230,6 +236,7 @@ function QuizPreview({profile} : any) {
                 <div className="row" style={{ marginTop: "30px", marginLeft: "70px", width: "80%" }}>
                     <div className="col-sm">
                         <button className="btn btn-light float-end" style={{ marginLeft: "70px" }} onClick={handleNext}>Next <GoTriangleRight /></button>
+                        <button className="btn btn-light float-end" style={{ marginLeft: "70px" }} onClick={handlePrevious}>Previous </button>
                     </div>
                 </div>
 

@@ -7,12 +7,15 @@ import Kanbas from "./Kanbas";
 import {HashRouter} from "react-router-dom";
 import {Link} from "react-router-dom";
 import {Routes, Route, Navigate} from "react-router";
+import Signin from './Users/Signin';
+
 function App() {
   return (
     <HashRouter>
       <div>
         <Routes>
-          <Route path="/" element={<Navigate to="/Kanbas/Account/Signin"/>}/>
+          <Route path="/" element={<Navigate to="/Signin"/>}/>
+          <Route path="/Signin" element={<Signin />} />
           <Route path="/Labs/*" element={<Labs/>}/>
           <Route path="/Kanbas/*" element={<Kanbas/>}/>
           <Route path="/hello" element={<HelloWorld />} />

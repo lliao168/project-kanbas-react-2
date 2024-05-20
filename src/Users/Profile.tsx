@@ -20,7 +20,7 @@ export default function Profile() {
     await client.signout();
     localStorage.clear(); 
     sessionStorage.clear();
-    navigate("/Kanbas/Account/Signin");
+    navigate("/Signin");
   };
   useEffect(() => {
     fetchProfile();
