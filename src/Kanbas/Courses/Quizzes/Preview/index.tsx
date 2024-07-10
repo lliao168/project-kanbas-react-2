@@ -264,7 +264,7 @@ function QuizPreview({profile} : any) {
 
                 <div className="row" style={{ marginTop: "30px", marginLeft: "70px", width: "80%" }}>
                     <div className="col-sm">
-                        <button className="btn btn-light float-end" style={{ marginLeft: "70px" }} onClick={handleNext}>Next <GoTriangleRight /></button>
+                        <button className="btn btn-light float-end" style={{ marginLeft: "10px" }} onClick={handleNext}>Next <GoTriangleRight /></button>
                         <button className="btn btn-light float-end" style={{ marginLeft: "70px" }} onClick={handlePrevious}>Previous </button>
                     </div>
                 </div>
