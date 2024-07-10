@@ -1,11 +1,11 @@
 import ModuleList from "./list";
 import "./index.css";
 
-function Modules() {
+function Modules({profile} : any) {
     return (
         <div>
             {/* <h2>Modules</h2> */}
-            <ModuleList />
+            <ModuleList profile = {profile} />
         </div>
     );
 }

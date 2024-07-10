@@ -10,6 +10,7 @@ import axios from "axios";
 import store from "./store";
 import { Provider } from "react-redux";
 import * as clientUser from "../Users/client"
+import Calendar from "./Calendar";
 const API_BASE = process.env.REACT_APP_API_BASE;
 
 
@@ -89,7 +90,8 @@ function Kanbas() {
                     <Route path="/" element={<Navigate to="Dashboard" />} />
                     <Route path="/Account/*" element={<Account />} />
                     <Route path="Dashboard" element={<Dashboard profile={profile}/>} />
-                    {/* <Route path="Courses" element={<Courses />} /> */}
+                    <Route path="Courses" element={<Dashboard profile={profile}/>} />
+                    <Route path = "Calendar" element={<Calendar/>}/>
                     <Route path="Courses/:courseId/*" element={<Courses profile={profile}/>}/>
                 </Routes>
             </div>

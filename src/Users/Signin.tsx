@@ -21,7 +21,7 @@ export default function Signin() {
       <div>
         <button className="btn btn-primary" onClick={signin}> Sign in </button>
       </div>
-      <Link to="/Kanbas/Account/signup" className="btn btn-danger mt-2">Sign up</Link>
+      <Link to="/signup" className="btn btn-danger mt-2">Sign up</Link>
     </div>
   );
 }

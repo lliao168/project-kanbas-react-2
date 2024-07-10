@@ -64,7 +64,6 @@ function formatDate(dateString: any) {
 
 function QuizPreview({profile} : any) {
     const { assignmentId, courseId, quizId, questionId } = useParams();
-
     const quizList = useSelector((state: KanbasState) => state.quizzesReducer.quizzes);
     const quiz = quizList.find(
         (quiz) => quiz.course === courseId && quiz._id === quizId
@@ -73,6 +72,9 @@ function QuizPreview({profile} : any) {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const currentQuestion = questions[currentQuestionIndex];
+    const [userAnswers, setUserAnswers] = useState<{ [key: string]: any }>({});
+    const [results, setResults] = useState<{ [key: string]: boolean }>({});
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -107,9 +109,43 @@ function QuizPreview({profile} : any) {
         }
     };
 
+    const handlePrevious = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(currentQuestionIndex - 1);
+        } else {
+            console.log('Already at the first question');
+        }
+    };
+
 
     const goToQuestion = (index: any) => {
         setCurrentQuestionIndex(index);
+    };
+
+    const handleAnswerChange = (questionId: string, answer: any) => {
+        setUserAnswers((prevAnswers) => ({
+            ...prevAnswers,
+            [questionId]: answer,
+        }));
+    };
+
+    const handleSubmitQuiz = () => {
+        const newResults: { [key: string]: boolean } = {};
+        questions.forEach((question) => {
+            const userAnswer = userAnswers[question._id];
+            if (question.questionType === 'Multiple Choice') {
+                const correctChoice = question.multipleChoice?.find(choice => choice.isCorrect);
+                newResults[question._id] = correctChoice?._id === userAnswer;
+            } else if (question.questionType === 'True/False') {
+                newResults[question._id] = question.trueFalse?.[0]?.isTrue === userAnswer;
+            } else if (question.questionType === 'Fill In the Blank') {
+                const correctAnswers = question.fillBlank?.map(blank => blank.correctAnswers) ?? [];
+                newResults[question._id] = correctAnswers.includes(userAnswer);
+            }
+        });
+        setResults(newResults);
+        setIsSubmitted(true);
+        console.log("hi");
     };
 
 
@@ -165,7 +201,6 @@ function QuizPreview({profile} : any) {
             <hr style={{ color: "black", marginLeft: "20px", marginRight: "20px" }} />
 
             <div className="p-4">
-
                 <div className="d-flex" style={{ marginLeft: "20px", marginRight: "20px" }}>
                     <div style={{ marginLeft: "30px", fontSize: "30px", marginTop: "20px" }}>
                         <CgPentagonRight />
@@ -185,15 +220,14 @@ function QuizPreview({profile} : any) {
                     <div style={{ width: "80%", marginLeft: "60px" }}>
                         {questions.filter((question: any) => question._id === currentQuestion._id).map((question: any, index: any) => (
                             <div key={question._id} className="d-grid gap-3 col-sm border border-1 p-4">
-                                <div style={{ fontSize: "1.2em", marginLeft: "30px" }}>{question.question}</div>
-
+                                <div style={{ fontSize: "1.2em", marginLeft: "30px" }}>{question.question.replace("<p>", " ").replace("</p>", " ")}</div>
                                 <hr style={{ color: "grey", marginLeft: "20px", marginRight: "20px", marginTop: "10px", marginBottom: "-5px" }} />
                                 {question.questionType === 'Multiple Choice' && (
                                     <ul className="list-group">
                                         {question.multipleChoice.map((choice: any) => (
                                             <li className="list-group-item" style={{ border: "transparent" }} key={choice._id}>
                                                 <div style={{ marginLeft: "30px" }}>
-                                                    <input type="radio" id={`option${choice._id}`} name={`answer${index}`}></input>
+                                                    <input type="radio" id={`option${choice._id}`} name={`answer${index}`} onChange={() => handleAnswerChange(question._id, choice._id)}></input>
                                                     <label htmlFor={`option${choice._id}`} style={{ marginLeft: "10px" }}>{choice.text}</label>
                                                 </div>
                                             </li>
@@ -203,12 +237,12 @@ function QuizPreview({profile} : any) {
                                 {question.questionType === 'True/False' && (
                                     <div>
                                         <div style={{ marginLeft: "40px" }}>
-                                            <input type="radio" id={`optionTrue${question._id}`} name={`answer${index}`} value="true"></input>
+                                            <input type="radio" id={`optionTrue${question._id}`} name={`answer${index}`} value="true" onChange={() => handleAnswerChange(question._id, true)}></input>
                                             <label htmlFor={`optionTrue${question._id}`} style={{ marginLeft: "10px" }}>True</label>
                                         </div>
                                         <hr style={{ color: "grey", marginLeft: "20px", marginRight: "20px" }} />
                                         <div style={{ marginLeft: "40px" }}>
-                                            <input type="radio" id={`optionFalse${question._id}`} name={`answer${index}`} value="false"></input>
+                                            <input type="radio" id={`optionFalse${question._id}`} name={`answer${index}`} value="false" onChange={() => handleAnswerChange(question._id, false)}></input>
                                             <label htmlFor={`optionFalse${question._id}`} style={{ marginLeft: "10px" }}>False</label>
                                         </div>
                                     </div>
@@ -218,7 +252,8 @@ function QuizPreview({profile} : any) {
                                         <div style={{ marginLeft: "20px" }} className="d-flex">
                                             <label id="answer1" style={{ marginLeft: "10px", marginRight: "20px" }}>Answer: </label>
                                             <input
-                                                id="answer1" className="form-control mb-2 w-25" />
+                                                id="answer1" className="form-control mb-2 w-25" 
+                                                onChange={(e) => handleAnswerChange(question._id, e.target.value)}/>
                                         </div>
                                     </li>
                                 ))}
@@ -230,6 +265,7 @@ function QuizPreview({profile} : any) {
                 <div className="row" style={{ marginTop: "30px", marginLeft: "70px", width: "80%" }}>
                     <div className="col-sm">
                         <button className="btn btn-light float-end" style={{ marginLeft: "70px" }} onClick={handleNext}>Next <GoTriangleRight /></button>
+                        <button className="btn btn-light float-end" style={{ marginLeft: "70px" }} onClick={handlePrevious}>Previous </button>
                     </div>
                 </div>
 
@@ -239,7 +275,8 @@ function QuizPreview({profile} : any) {
                             <div className="col-sm">
                                 <div className="form-check float-end">
                                     <span style={{ marginRight: "10px" }}>Quiz saved at {formatDate(new Date())} </span>
-                                    <button className="btn btn-light float-end">
+                                    <button className="btn btn-light float-end"
+                                    onClick={handleSubmitQuiz}>
                                         Submit Quiz
                                     </button>
                                 </div>
@@ -247,6 +284,28 @@ function QuizPreview({profile} : any) {
                         </div>
                     </div>
                 </div>
+
+                {isSubmitted && (
+                    <div className="row" style={{ marginTop: "30px", marginLeft: "70px", width: "80%" }}>
+                        <div className="d-grid gap-3 col-sm border border-success p-4">
+                            <h4>Results</h4>
+                            {questions.map((question) => (
+                                <div key={question._id}>
+                                    <div>{question.question.replace("<p>", " ").replace("</p>", " ")}</div>
+                                    <div>
+                                        {results[question._id] ? (
+                                            <span style={{ color: 'green' }}>Correct</span>
+                                        ) : (
+                                            <span style={{ color: 'red' }}>Incorrect</span>
+                                        )}
+                                    </div>
+                                    <hr />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
 
                 
                 {profile && (profile.role === "FACULTY" || profile.role === "ADMIN") && (
